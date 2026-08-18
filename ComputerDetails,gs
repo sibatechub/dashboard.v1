@@ -1,0 +1,178 @@
+function getComputerDetailsLink(sessionToken, ticketNo) {
+
+  try {
+
+    // ============================================
+    // CHECK LOGIN SESSION
+    // ============================================
+
+    const session = getUserSession(sessionToken);
+
+    if (!session) {
+      throw new Error("Session expired. Please login again.");
+    }
+
+
+    // ============================================
+    // VALIDATE TICKET NUMBER
+    // ============================================
+
+    ticketNo = String(ticketNo || "").trim();
+
+    if (!ticketNo) {
+      throw new Error("Ticket number is missing.");
+    }
+
+
+    // ============================================
+    // GET TICKET DATA
+    // ============================================
+
+    const tickets = getAllTickets(sessionToken);
+
+    if (!Array.isArray(tickets)) {
+      throw new Error("Unable to load ticket information.");
+    }
+
+
+    const ticket = tickets.find(function(t) {
+
+      return String(t.ticketNo || "").trim() === ticketNo;
+
+    });
+
+
+    if (!ticket) {
+
+      throw new Error(
+        "Ticket not found."
+      );
+
+    }
+
+
+    // ============================================
+    // GET ASSET NUMBER
+    // ============================================
+
+    const assetNo =
+      String(ticket.assetNo || "").trim();
+
+
+    if (!assetNo) {
+
+      throw new Error(
+        "No asset number is associated with this ticket."
+      );
+
+    }
+
+
+    // ============================================
+    // OPEN INVENTORY DATABASE
+    // ============================================
+
+    const inventorySS =
+      SpreadsheetApp.openById(
+        "1w7UhKvXK_zk-M3qXG0cCrc_FVdW3eOQ4Pei7lwiSy5A"
+      );
+
+
+    const inventorySheet =
+      inventorySS.getSheetByName("Master");
+
+
+    if (!inventorySheet) {
+
+      throw new Error(
+        "Inventory Master sheet not found."
+      );
+
+    }
+
+
+    // ============================================
+    // GET INVENTORY DATA
+    // ============================================
+
+    const inventoryData =
+      inventorySheet
+        .getDataRange()
+        .getValues();
+
+
+    // ============================================
+    // FIND COMPUTER
+    // ============================================
+
+    let computerLink = "";
+
+
+    for (let j = 1; j < inventoryData.length; j++) {
+
+      // Column D = Computer No
+      const dbComputer =
+        String(inventoryData[j][3] || "").trim();
+
+
+      if (
+        dbComputer.toUpperCase() ===
+        assetNo.toUpperCase()
+      ) {
+
+        // Column R = Computer Details Link
+        computerLink =
+          String(inventoryData[j][17] || "").trim();
+
+        break;
+
+      }
+
+    }
+
+
+    // ============================================
+    // COMPUTER NOT FOUND
+    // ============================================
+
+    if (!computerLink) {
+
+      throw new Error(
+        "Computer details not found for asset: " +
+        assetNo
+      );
+
+    }
+
+
+    // ============================================
+    // RETURN
+    // ============================================
+
+    return {
+
+      success: true,
+
+      ticketNo: ticketNo,
+
+      assetNo: assetNo,
+
+      computerLink: computerLink,
+
+      formUrl: computerLink
+
+    };
+
+
+  } catch (error) {
+
+    Logger.log(
+      "Computer Details Link Error: " +
+      error.message
+    );
+
+    throw new Error(error.message);
+
+  }
+
+}
