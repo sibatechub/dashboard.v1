@@ -1148,6 +1148,18 @@ data.forEach(function(ticket){
 
         </button>
 
+
+        <!-- COMPUTER DETAILS -->
+        <button
+            class="asset-btn btn-asset-details recent-action-btn"
+            data-ticket="${ticket.ticketNo}"
+            title="Computer Details">
+
+            <i class="fa-solid fa-desktop"></i>
+
+        </button>
+
+
         ${
             String(ticket.status || "").toUpperCase() !== "CLOSED"
             ? `
