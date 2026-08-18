@@ -1,0 +1,193 @@
+<div class="building-page">
+
+    <!-- Header -->
+    <div class="building-header">
+
+        <div>
+            <h2>
+                <i class="fa-solid fa-building"></i>
+                Buildings
+            </h2>
+
+            <p>Manage Building & Technician Assignment</p>
+        </div>
+
+        <button class="add-btn">
+            <i class="fa-solid fa-plus"></i>
+            Add Building
+        </button>
+
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="building-cards">
+
+        <div class="building-card">
+            <h3 id="totalBuildingsCard">0</h3>
+            <span>Total Buildings</span>
+        </div>
+
+        <div class="building-card">
+            <h3 id="activeBuildingsCard">0</h3>
+            <span>Active Buildings</span>
+        </div>
+
+        <div class="building-card">
+            <h3 id="overrideBuildingsCard">0</h3>
+            <span>Override Active</span>
+        </div>
+
+        <div class="building-card">
+            <h3 id="techniciansCard">0</h3>
+            <span>Technicians</span>
+        </div>
+
+    </div>
+
+    <!-- Toolbar -->
+    <div class="building-toolbar">
+
+        <input
+            type="text"
+            id="buildingSearch"
+            placeholder="Search Building...">
+
+        <select id="statusFilter">
+            <option value="">All Status</option>
+            <option value="YES">Active</option>
+            <option value="NO">Inactive</option>
+        </select>
+
+        <select id="technicianFilter">
+            <option value="">All Technicians</option>
+        </select>
+
+        <button id="refreshBuilding">
+            <i class="fa-solid fa-rotate-right"></i>
+            Refresh
+        </button>
+
+    </div>
+
+    <!-- Table -->
+    <div class="table-container">
+
+        <table class="building-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>#</th>
+                    <th>Building</th>
+                    <th>Technician</th>
+                    <th>Email</th>
+                    <th>Mobile</th>
+                    <th>Tickets</th>
+                    <th>Override</th>
+                    <th>Status</th>
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="buildingTableBody">
+
+                <tr>
+
+                    <td colspan="9" style="text-align:center;">
+                        Loading...
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+<!-- ===========================================
+     EDIT BUILDING MODAL
+=========================================== -->
+
+<div id="editBuildingModal" class="building-modal" style="display:none;">
+
+    <div class="building-modal-content">
+
+        <div class="building-modal-header">
+
+            <h3>
+                <i class="fa-solid fa-pen-to-square"></i>
+                Edit Building
+            </h3>
+
+            <span id="closeBuildingModal">&times;</span>
+
+        </div>
+
+        <div class="building-form">
+
+            <label>Building Name</label>
+
+            <input
+                type="text"
+                id="editBuildingName"
+                readonly>
+
+            <label>Technician</label>
+
+            <select id="editTechnician">
+            </select>
+
+            <label>Email</label>
+
+            <input
+                type="email"
+                id="editEmail"
+                readonly>
+
+            <label>Mobile</label>
+
+            <input
+                type="text"
+                id="editMobile"
+                readonly>
+
+            <label>Status</label>
+
+            <select id="editStatus">
+
+                <option value="YES">Active</option>
+
+                <option value="NO">Inactive</option>
+
+            </select>
+
+            <div class="modal-buttons">
+
+                <button
+                    id="btnSaveBuilding"
+                    class="save-btn">
+
+                    Save Changes
+
+                </button>
+
+                <button
+                    id="btnCancelBuilding"
+                    class="cancel-btn">
+
+                    Cancel
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
