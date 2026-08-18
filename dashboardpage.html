@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+
+
+
+
+<head>
+
+
+
+
+ <base target="_top">
+
+
+
+
+<?!= include('DashboardCSS'); ?>
+<?!= include('AllTicketsCSS'); ?>
+<?!= include('UsersCSS'); ?>
+<?!= include('BuildingsCSS'); ?>
+<?!= include('FeedbackCSS'); ?>
+<?!= include('AccountCSS'); ?>
+<?!= include('WorkHandoverCSS'); ?>
+
+
+
+
+ <link rel="preconnect" href="https://fonts.googleapis.com">
+
+
+
+
+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+
+
+
+ <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+
+ <link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+
+
+</head>
+
+
+
+
+<body>
+
+
+
+
+<div class="dashboard">
+
+
+
+
+   <!-- Sidebar -->
+   <?!= include("Sidebar"); ?>
+
+
+
+
+   <!-- Main Area -->
+   <div class="main">
+
+
+
+
+       <!-- Header -->
+       <?!= include("Header"); ?>
+
+
+
+
+       <!-- Content -->
+<!-- Content -->
+<div id="content">
+
+
+   <!-- Dashboard -->
+   <div id="dashboardPage">
+       <?!= include("DashboardHome"); ?>
+   </div>
+   <!-- ticketsPage -->
+   <div id="ticketsPage" style="display:none;">
+   <?!= include("AllTickets"); ?>
+</div>
+
+
+   <!-- Users -->
+   <div id="usersPage" style="display:none;">
+       <?!= include("Users"); ?>
+   </div>
+
+   <!-- Buildings -->
+<div id="buildingsPage" style="display:none;">
+    <?!= include("Buildings"); ?>
+</div>
+
+<!-- Feedback -->
+<div id="feedbackPage" style="display:none;">
+    <?!= include("Feedback"); ?>
+</div>
+
+<!-- Account -->
+<div id="accountPage" style="display:none;">
+    <?!= include("Account"); ?>
+</div>
+
+<!-- Work Handover -->
+<div id="workHandoverPage" style="display:none;">
+    <?!= include("WorkHandover"); ?>
+</div>
+
+</div>
+<!-- ==========================================
+    Ticket Details Modal
+========================================== -->
+
+
+
+
+<div id="ticketModal" class="ticket-modal">
+
+
+
+
+   <div class="ticket-modal-content">
+
+
+
+
+       <div class="ticket-modal-header">
+
+
+
+
+           <h2>
+
+
+
+
+               <i class="fa-solid fa-ticket"></i>
+
+
+
+
+               Ticket Details
+
+
+
+
+           </h2>
+
+
+
+
+           <span id="closeTicketModal">&times;</span>
+
+
+
+
+       </div>
+
+
+
+
+       <div id="ticketDetails">
+
+
+
+
+           Loading...
+
+
+
+
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+</div>
+
+
+
+
+   </div>
+
+
+
+
+</div>
+
+
+
+
+<?!= include("DashboardJS"); ?>
+<?!= include("AllTicketsJS"); ?>
+<?!= include("UsersJS"); ?>
+<?!= include("BuildingsJS"); ?>
+<?!= include("FeedbackJS"); ?>
+<?!= include("AccountJS"); ?>
+<?!= include("WorkHandoverJS"); ?>
+
+
+
+
+</body>
+
+
+
+
+</html>
+
+
+
+
+
+
+
