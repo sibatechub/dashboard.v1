@@ -1,0 +1,630 @@
+<div class="dashboard-home">
+<div class="dashboard-filter">
+
+
+
+
+   <input type="date"
+          id="filterDate"
+          class="filter-input">
+
+
+
+
+   <select id="filterBuilding"
+           class="filter-select">
+
+
+
+
+       <option value="">🏢 All Buildings</option>
+
+
+
+
+   </select>
+
+
+
+
+   <select id="filterTechnician"
+           class="filter-select">
+
+
+
+
+       <option value="">👨 All Technicians</option>
+
+
+
+
+   </select>
+
+
+
+
+   <button class="filter-btn"
+           id="btnFilter">
+
+
+
+
+       <i class="fa-solid fa-filter"></i>
+
+
+
+
+       Filter
+
+
+
+
+   </button>
+
+
+
+
+   <button class="refresh-btn" id="btnRefresh">
+       <i class="fa-solid fa-rotate-right"></i>
+   </button>
+<div class="refresh-area">
+   <div class="auto-refresh">
+       <i class="fa-solid fa-rotate"></i>
+       Auto Refresh in:
+       <span id="refreshCountdown">01:00</span>
+   </div>
+
+
+
+
+</div>
+
+
+
+
+</div> <!-- CLOSE dashboard-filter HERE -->
+
+
+
+
+<!-- ===============================
+    Statistics Cards
+================================ -->
+
+
+
+
+<div class="stats-grid">
+
+
+
+
+   <!-- Total Ticket -->
+
+
+
+
+   <div class="stat-card blue" id="cardTotal" onclick="filterByStatus('TOTAL')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-ticket"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="totalTickets">0</h3>
+           <p>Total Tickets</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- Open -->
+
+
+
+
+   <div class="stat-card red" id="cardOpen" onclick="filterByStatus('OPEN')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-folder-open"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="openTickets">0</h3>
+           <p>Open Tickets</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- Immediate -->
+
+
+
+
+   <div class="stat-card orange" id="cardImmediate" onclick="filterByStatus('IMMEDIATE')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-bolt"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="immediateTickets">0</h3>
+           <p>Immediate</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- Accepted -->
+
+
+
+
+   <div class="stat-card cyan" id="cardAccepted" onclick="filterByStatus('ACCEPTED')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-user-check"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="acceptedTickets">0</h3>
+           <p>Accepted</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- Pending -->
+
+
+
+
+   <div class="stat-card purple" id="cardPending" onclick="filterByStatus('PENDING')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-hourglass-half"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="pendingTickets">0</h3>
+           <p>Pending</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- Reopen -->
+
+
+
+
+   <div class="stat-card pink" id="cardReopen" onclick="filterByStatus('REOPEN')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-rotate-left"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="reopenTickets">0</h3>
+           <p>Reopen</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- Closed -->
+
+
+
+
+   <div class="stat-card green" id="cardClosed" onclick="filterByStatus('CLOSED')">
+
+
+
+
+       <div class="icon">
+           <i class="fa-solid fa-circle-check"></i>
+       </div>
+
+
+
+
+       <div class="details">
+           <h3 id="closedTickets">0</h3>
+           <p>Closed</p>
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+   <!-- ===============================
+        Charts Area
+   ================================ -->
+
+
+
+
+   <div class="dashboard-row">
+
+
+
+
+       <div class="dashboard-box">
+
+
+
+
+           <h3>
+
+
+
+
+               <i class="fa-solid fa-chart-column"></i>
+
+
+
+
+               Ticket Status
+
+
+
+
+           </h3>
+
+
+
+
+           <div id="ticketChart">
+
+
+
+
+               Chart Coming Soon
+
+
+
+
+           </div>
+
+
+
+
+       </div>
+
+
+
+
+
+
+
+
+
+
+
+
+       <div class="dashboard-box">
+
+
+
+
+           <h3>
+
+
+
+
+               <i class="fa-solid fa-chart-pie"></i>
+
+
+
+
+               Technician Performance
+
+
+
+
+           </h3>
+
+
+
+
+           <div id="techChart">
+
+
+
+
+               Chart Coming Soon
+
+
+
+
+           </div>
+
+
+
+
+       </div>
+
+
+
+
+   </div>
+
+
+
+
+
+
+
+
+   <!-- ===============================
+        Recent Tickets
+   ================================ -->
+
+
+
+
+   <div class="dashboard-box">
+
+
+
+
+       <h3>
+
+
+
+
+           <i class="fa-solid fa-list"></i>
+
+
+
+
+           Recent Tickets
+
+
+
+
+       </h3>
+
+
+
+
+<div id="recentTickets">
+
+
+
+
+<table class="recent-ticket-table">
+
+
+
+
+<thead>
+
+
+
+
+<tr>
+
+
+
+
+<th>Ticket No</th>
+
+
+
+
+<th>Status</th>
+
+
+
+
+<th>Priority</th>
+
+
+
+
+<th>Building</th>
+
+
+
+
+<th>Faculty / Staff</th>
+
+
+
+
+<th>Asset Type</th>
+
+
+
+
+<th>Problem</th>
+
+
+
+
+<th>Technician</th>
+
+
+
+
+<th>Action</th>
+
+
+
+
+</tr>
+
+
+
+
+</thead>
+
+
+
+
+<tbody id="recentTicketBody">
+
+
+
+
+<tr>
+
+
+
+
+<td colspan="9" style="text-align:center; padding:25px;">
+
+
+
+
+Loading Recent Tickets...
+
+
+
+
+</td>
+
+
+
+
+</tr>
+
+
+
+
+</tbody>
+
+
+
+
+</table>
+
+
+
+
+</div>
+
+
+
+
+   </div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
