@@ -1,0 +1,402 @@
+<div id="workHandoverPage" class="workhandover-page">
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <div class="workhandover-header">
+
+        <div>
+
+            <h1>
+                <i class="fa-solid fa-right-left"></i>
+                Work Handover
+            </h1>
+
+            <p>
+                Transfer your building responsibility to another technician
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         MAIN GRID
+    ========================================== -->
+
+    <div class="workhandover-grid">
+
+
+        <!-- =====================================
+             CREATE HANDOVER
+        ====================================== -->
+
+        <div class="workhandover-card">
+
+            <div class="workhandover-card-header">
+
+                <div class="workhandover-card-icon">
+                    <i class="fa-solid fa-person-walking-arrow-right"></i>
+                </div>
+
+                <div>
+
+                    <h2>
+                        Create Work Handover
+                    </h2>
+
+                    <p>
+                        Assign your building to another technician
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="workhandover-form">
+
+
+                <!-- Building -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Building <span>*</span>
+                    </label>
+
+                    <select
+                        id="handoverBuilding"
+                        class="workhandover-select"
+                    >
+
+                        <option value="">
+                            Select Building
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Original Technician -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Original Technician
+                    </label>
+
+                    <div class="workhandover-readonly">
+
+                        <input
+                            type="text"
+                            id="handoverOriginalTechnician"
+                            class="workhandover-input"
+                            readonly
+                            placeholder="Loading..."
+                        >
+
+                        <i class="fa-solid fa-lock"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Override Technician -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Override Technician <span>*</span>
+                    </label>
+
+                    <select
+                        id="handoverOverrideTechnician"
+                        class="workhandover-select"
+                    >
+
+                        <option value="">
+                            Select Technician
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Override Technician Email
+                    </label>
+
+                    <div class="workhandover-readonly">
+
+                        <input
+                            type="text"
+                            id="handoverOverrideEmail"
+                            class="workhandover-input"
+                            readonly
+                            placeholder="Automatically selected"
+                        >
+
+                        <i class="fa-solid fa-lock"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Mobile -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Override Technician Mobile
+                    </label>
+
+                    <div class="workhandover-readonly">
+
+                        <input
+                            type="text"
+                            id="handoverOverrideMobile"
+                            class="workhandover-input"
+                            readonly
+                            placeholder="Automatically selected"
+                        >
+
+                        <i class="fa-solid fa-lock"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Dates -->
+
+                <div class="workhandover-two-column">
+
+                    <div class="workhandover-form-group">
+
+                        <label>
+                            Start Date <span>*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="handoverStartDate"
+                            class="workhandover-input"
+                        >
+
+                    </div>
+
+
+                    <div class="workhandover-form-group">
+
+                        <label>
+                            End Date <span>*</span>
+                        </label>
+
+                        <input
+                            type="date"
+                            id="handoverEndDate"
+                            class="workhandover-input"
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Reason -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Override Reason
+                    </label>
+
+                    <textarea
+                        id="handoverReason"
+                        class="workhandover-textarea"
+                        placeholder="Enter reason for work handover..."
+                    ></textarea>
+
+                </div>
+
+
+                <!-- Status -->
+
+                <div class="workhandover-form-group">
+
+                    <label>
+                        Status
+                    </label>
+
+                    <div class="workhandover-status">
+
+                        <span class="workhandover-status-dot"></span>
+
+                        YES — Active
+
+                    </div>
+
+                </div>
+
+
+                <!-- Info -->
+
+                <div class="workhandover-info">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <span>
+                        Your building and technician details are
+                        automatically selected based on your account.
+                        Override technician contact details cannot be
+                        manually changed.
+                    </span>
+
+                </div>
+
+
+                <!-- Buttons -->
+
+                <div class="workhandover-buttons">
+
+                    <button
+                        type="button"
+                        id="btnResetHandover"
+                        class="workhandover-secondary-btn"
+                    >
+
+                        <i class="fa-solid fa-rotate-left"></i>
+
+                        Reset
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnCreateHandover"
+                        class="workhandover-primary-btn"
+                    >
+
+                        <i class="fa-solid fa-right-left"></i>
+
+                        Create Handover
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             MY WORK HANDOVERS
+        ====================================== -->
+
+        <div class="workhandover-card">
+
+            <div class="workhandover-card-header">
+
+                <div class="workhandover-card-icon">
+
+                    <i class="fa-solid fa-list-check"></i>
+
+                </div>
+
+                <div>
+
+                    <h2>
+                        My Work Handover
+                    </h2>
+
+                    <p>
+                        Handover assigned by you or assigned to you
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="workhandover-table-wrapper">
+
+                <table class="workhandover-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Building
+                            </th>
+
+                            <th>
+                                Original Technician
+                            </th>
+
+                            <th>
+                                Override Technician
+                            </th>
+
+                            <th>
+                                Start
+                            </th>
+
+                            <th>
+                                End
+                            </th>
+
+                            <th>
+                                Status
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="workhandoverTableBody">
+
+                        <tr>
+
+                            <td
+                                colspan="6"
+                                class="workhandover-empty"
+                            >
+
+                                <i class="fa-solid fa-right-left"></i>
+
+                                <strong>
+                                    No Work Handover
+                                </strong>
+
+                                No handover records found.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
