@@ -1,0 +1,294 @@
+<div class="tickets-page">
+
+    <!-- =========================
+            PAGE HEADER
+    ========================== -->
+
+    <div class="ticket-page-header">
+
+        <div class="header-left">
+
+            <h2>
+                <i class="fa-solid fa-ticket"></i>
+                All Tickets
+            </h2>
+
+            <p>
+                Manage and monitor all IT Breakdown Tickets from one place.
+            </p>
+
+        </div>
+
+        <div class="header-right">
+
+            <div class="ticket-counter">
+
+                <span>Total Tickets</span>
+
+                <h2 id="ticketCount">0</h2>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+            SEARCH BAR
+    ========================== -->
+
+<div class="search-filter-card">
+
+    <!-- Search -->
+
+    <div class="search-box">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+
+        <input
+            type="text"
+            id="searchTicket"
+            placeholder="Search Ticket No, Faculty, Mobile, Asset Number, Building, Technician...">
+
+    </div>
+
+    <!-- Filters -->
+
+    <div class="filter-row">
+
+<input type="date" id="ticketFilterFromDate">
+
+<input type="date" id="ticketFilterToDate">
+
+<select id="ticketFilterBuilding">
+            <option value="">🏢 All Buildings</option>
+        </select>
+
+<select id="ticketFilterTechnician">
+            <option value="">👨 All Technicians</option>
+        </select>
+
+        <select id="filterStatus">
+            <option value="">📌 All Status</option>
+
+            <option>OPEN</option>
+            <option>ACCEPTED</option>
+            <option>PENDING</option>
+            <option>REOPEN</option>
+            <option>CLOSED</option>
+
+        </select>
+
+        <select id="filterPriority">
+            <option value="">⚡ All Priority</option>
+
+            <option>IMMEDIATE</option>
+            <option>HIGH</option>
+            <option>NORMAL</option>
+            <option>LOW</option>
+
+        </select>
+
+        <button id="btnFilterTicket" class="btn-primary">
+
+            <i class="fa-solid fa-filter"></i>
+
+            Filter
+
+        </button>
+
+        <button id="btnResetTicket" class="btn-warning">
+
+            <i class="fa-solid fa-rotate-right"></i>
+
+            Reset
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+    <!-- =========================
+            ACTION BAR
+    ========================== -->
+
+    <div class="toolbar">
+
+        <div class="toolbar-left">
+
+<button id="btnExcel" class="toolbar-btn excel">
+    <i class="fa-solid fa-file-excel"></i>
+    Excel
+</button>
+
+<button id="btnPDF" class="toolbar-btn pdf">
+    <i class="fa-solid fa-file-pdf"></i>
+    PDF
+</button>
+
+            <button id="btnPrint" class="toolbar-btn print">
+
+                <i class="fa-solid fa-print"></i>
+
+                Print
+
+            </button>
+
+            <button id="btnRefreshTicket" class="toolbar-btn refresh">
+
+                <i class="fa-solid fa-arrows-rotate"></i>
+
+                Refresh
+
+            </button>
+
+        </div>
+
+        <div class="toolbar-right">
+
+            <span>
+
+                Showing
+
+                <b id="showingTickets">
+
+                    0
+
+                </b>
+
+                Tickets
+
+            </span>
+
+        </div>
+
+    </div>
+
+
+
+    <!-- =========================
+            TABLE
+    ========================== -->
+
+    <div class="table-card">
+
+        <table class="ticket-table">
+
+            <thead>
+
+                <tr>
+
+                    <th width="120">Ticket No</th>
+
+                    <th>Status</th>
+
+                    <th>Priority</th>
+
+                    <th>Faculty / Staff</th>
+
+                    <th>Building</th>
+
+                    <th>Room</th>
+
+                    <th>Problem</th>
+
+                    <th>Technician</th>
+
+                    <th width="140">Created Date</th>
+
+                    <th width="100">Action</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="ticketTableBody">
+
+                <tr>
+
+                    <td colspan="10">
+
+                        <div class="empty-state">
+
+                            <i class="fa-solid fa-ticket"></i>
+
+                            <h3>
+
+                                No Tickets Found
+
+                            </h3>
+
+                            <p>
+
+                                Tickets will appear here once data is loaded.
+
+                            </p>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+
+    <!-- =========================
+            PAGINATION
+    ========================== -->
+
+    <div class="pagination-bar">
+
+        <div>
+
+            Rows per page
+
+            <select id="pageSize">
+
+                <option>10</option>
+
+                <option selected>25</option>
+
+                <option>50</option>
+
+                <option>100</option>
+
+            </select>
+
+        </div>
+
+        <div class="pagination-buttons">
+
+            <button>
+
+                <i class="fa-solid fa-angle-left"></i>
+
+            </button>
+
+            <button class="active">
+
+                1
+
+            </button>
+
+            <button>
+
+                <i class="fa-solid fa-angle-right"></i>
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
