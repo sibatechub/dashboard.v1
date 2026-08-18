@@ -1,0 +1,376 @@
+<script>
+  let allBuildings = [];
+
+function loadBuildings(){
+
+    loadBuildingStatistics();
+
+    google.script.run
+        .withSuccessHandler(function(data){
+
+            // Store original data only once
+            allBuildings = data;
+
+            // Build technician dropdown once
+            loadBuildingTechnicianFilter(allBuildings);
+
+            // Render table
+            renderBuildings(allBuildings);
+
+        })
+        .getBuildings(getSessionToken());
+
+}
+function renderBuildings(data){
+
+    let html="";
+
+    data.forEach(function(building, index){
+
+        const statusBadge =
+            building.status == "YES"
+            ? '<span class="status-active">Active</span>'
+            : '<span class="status-inactive">Inactive</span>';
+
+        // Temporary value
+const overrideBadge =
+    building.override
+    ? '<span class="override-yes">Override</span>'
+    : '<span class="override-no">Normal</span>';
+
+        html += `
+
+        <tr>
+
+            <td>${index + 1}</td>
+
+            <td>${building.building}</td>
+
+            <td>${building.technician}</td>
+
+            <td>${building.email}</td>
+
+            <td>${building.mobile}</td>
+
+            <td>
+
+    <span class="ticket-count">
+
+        ${building.tickets}
+
+    </span>
+
+</td>
+
+            <td>${overrideBadge}</td>
+
+            <td>${statusBadge}</td>
+
+<td>
+
+    <button class="action-btn view-btn"
+        onclick="viewBuilding('${building.building}')">
+
+        <i class="fa-solid fa-eye"></i>
+
+    </button>
+
+    ${
+        window.currentUserRole === "ADMIN"
+        ?
+        `
+        <button class="action-btn edit-btn"
+            onclick="editBuilding('${building.building}')">
+
+            <i class="fa-solid fa-pen"></i>
+
+        </button>
+        `
+        :
+        ""
+    }
+
+</td>
+
+        </tr>
+
+        `;
+
+    });
+
+    document.getElementById("buildingTableBody").innerHTML = html;
+
+}
+
+/* Temporary Functions */
+
+function viewBuilding(building){
+
+    alert("View : " + building);
+
+}
+
+let technicianList = [];
+let currentEditingBuilding = "";
+
+function editBuilding(buildingName){
+
+    currentEditingBuilding = buildingName;
+
+    google.script.run
+
+        .withSuccessHandler(function(result){
+
+            technicianList = result.technicians;
+
+            // Building Name
+            document.getElementById("editBuildingName").value =
+                result.building.building;
+
+            // Status
+            document.getElementById("editStatus").value =
+                result.building.status;
+
+            // Technician Dropdown
+            const techSelect =
+                document.getElementById("editTechnician");
+
+            techSelect.innerHTML = "";
+
+            technicianList.forEach(function(tech){
+
+                techSelect.innerHTML +=
+                    `<option value="${tech.name}">
+                        ${tech.name}
+                    </option>`;
+
+            });
+
+            // Select Current Technician
+            techSelect.value =
+                result.building.technician;
+
+            // Fill Email & Mobile
+            updateTechnicianInfo();
+
+            // Open Modal
+            document.getElementById("editBuildingModal").style.display = "flex";
+
+        })
+
+        .getBuildingForEdit(buildingName);
+
+}
+function loadBuildingStatistics(){
+
+    google.script.run
+
+        .withSuccessHandler(function(stats){
+
+            document.getElementById("totalBuildingsCard").innerHTML =
+                stats.totalBuildings;
+
+            document.getElementById("activeBuildingsCard").innerHTML =
+                stats.activeBuildings;
+
+            document.getElementById("overrideBuildingsCard").innerHTML =
+                stats.overrideActive;
+
+            document.getElementById("techniciansCard").innerHTML =
+                stats.technicians;
+
+        })
+
+        .getBuildingStatistics(getSessionToken());
+
+}
+function filterBuildings(){
+
+    const keyword = document
+        .getElementById("buildingSearch")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const status =
+        document.getElementById("statusFilter").value;
+
+    const technician =
+        document.getElementById("technicianFilter").value;
+
+    const filtered = allBuildings.filter(function(building){
+
+        const universalSearch =
+
+            building.building.toLowerCase().includes(keyword) ||
+
+            building.technician.toLowerCase().includes(keyword) ||
+
+            building.email.toLowerCase().includes(keyword) ||
+
+            String(building.mobile).includes(keyword) ||
+
+            building.status.toLowerCase().includes(keyword);
+
+        const statusMatch =
+
+            status == "" ||
+
+            building.status == status;
+
+        const technicianMatch =
+
+            technician == "" ||
+
+            building.technician == technician;
+
+        return universalSearch &&
+               statusMatch &&
+               technicianMatch;
+
+    });
+
+    renderBuildings(filtered);
+
+}
+// Search
+document
+.getElementById("buildingSearch")
+.addEventListener("keyup", filterBuildings);
+
+// Status Filter
+document
+.getElementById("statusFilter")
+.addEventListener("change", filterBuildings);
+
+// Technician Filter
+document
+.getElementById("technicianFilter")
+.addEventListener("change", filterBuildings);
+
+// Refresh
+document
+.getElementById("refreshBuilding")
+.addEventListener("click", function(){
+
+    document.getElementById("buildingSearch").value = "";
+    document.getElementById("statusFilter").value = "";
+    document.getElementById("technicianFilter").value = "";
+
+    loadBuildings();
+
+});
+function loadBuildingTechnicianFilter(data){
+
+    const technicianFilter =
+        document.getElementById("technicianFilter");
+
+    technicianFilter.innerHTML =
+        '<option value="">All Technicians</option>';
+
+    const technicians = [
+        ...new Set(
+            data.map(item => item.technician)
+                .filter(Boolean)
+        )
+    ].sort();
+
+    technicians.forEach(function(name){
+
+        technicianFilter.innerHTML +=
+            `<option value="${name}">${name}</option>`;
+
+    });
+
+}
+function updateTechnicianInfo(){
+
+    const technicianName =
+        document.getElementById("editTechnician").value;
+
+    const technician = technicianList.find(function(item){
+
+        return item.name === technicianName;
+
+    });
+
+    if(!technician) return;
+
+    document.getElementById("editEmail").value =
+        technician.email;
+
+    document.getElementById("editMobile").value =
+        technician.mobile;
+
+}
+document
+.getElementById("editTechnician")
+.addEventListener("change", updateTechnicianInfo);
+document
+.getElementById("btnSaveBuilding")
+.addEventListener("click", function(){
+
+    const building = {
+
+        building:
+            document.getElementById("editBuildingName").value,
+
+        technician:
+            document.getElementById("editTechnician").value,
+
+        email:
+            document.getElementById("editEmail").value,
+
+        mobile:
+            document.getElementById("editMobile").value,
+
+        status:
+            document.getElementById("editStatus").value
+
+    };
+
+    google.script.run
+
+        .withSuccessHandler(function(success){
+
+            if(success){
+
+                Swal.fire({
+
+                    icon:"success",
+
+                    title:"Updated",
+
+                    text:"Building updated successfully."
+
+                });
+
+                document.getElementById("editBuildingModal").style.display = "none";
+
+                loadBuildings();
+
+            }
+
+        })
+
+        .updateBuilding(building);
+
+});
+document
+.getElementById("btnCancelBuilding")
+.addEventListener("click", function(){
+
+    document.getElementById("editBuildingModal").style.display = "none";
+
+});
+document
+.getElementById("closeBuildingModal")
+.addEventListener("click", function(){
+
+    document.getElementById("editBuildingModal").style.display = "none";
+
+});
+
+loadBuildings();
+
+</script>
