@@ -1,0 +1,720 @@
+<div class="account-page">
+
+    <!-- =========================================
+         ACCOUNT HEADER
+    ========================================== -->
+
+    <div class="account-header">
+
+        <div>
+
+            <h1>
+                <i class="fa-solid fa-user"></i>
+                My Account
+            </h1>
+
+            <p>
+                Manage your profile and account settings
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         PROFILE SUMMARY
+    ========================================== -->
+
+    <div class="account-profile-card">
+
+        <div class="account-profile-left">
+
+            <div class="account-avatar" id="accountAvatar">
+                A
+            </div>
+
+            <div class="account-profile-info">
+
+                <h2 id="accountProfileName">
+                    Loading...
+                </h2>
+
+                <span class="account-role-badge" id="accountProfileRole">
+                    -
+                </span>
+
+                <div class="account-status">
+
+                    <span class="status-dot"></span>
+
+                    <span id="accountProfileStatus">
+                        Active
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="account-profile-details">
+
+            <div class="profile-detail-item">
+
+                <div class="profile-detail-icon">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+
+                <div>
+
+                    <span>User ID</span>
+
+                    <strong id="accountHeaderUserId">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-detail-item">
+
+                <div class="profile-detail-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+
+                <div>
+
+                    <span>Email</span>
+
+                    <strong id="accountHeaderEmail">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="profile-detail-item">
+
+                <div class="profile-detail-icon">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+
+                <div>
+
+                    <span>Mobile</span>
+
+                    <strong id="accountHeaderMobile">
+                        -
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         PERSONAL + ACCOUNT INFORMATION
+    ========================================== -->
+
+    <div class="account-two-column">
+
+
+        <!-- =====================================
+             PERSONAL INFORMATION
+        ====================================== -->
+
+        <div class="account-card">
+
+            <div class="account-card-header">
+
+                <div class="account-card-icon">
+
+                    <i class="fa-solid fa-user"></i>
+
+                </div>
+
+                <div>
+
+                    <h2>
+                        Personal Information
+                    </h2>
+
+                    <p>
+                        Update your personal details
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="account-form-grid">
+
+
+                <!-- User ID -->
+
+                <div class="account-form-group">
+
+                    <label for="accountUserId">
+
+                        User ID
+
+                        <span>*</span>
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="accountUserId"
+                        placeholder="Enter User ID"
+                        autocomplete="off"
+                    >
+
+                    <small id="accountUserIdMessage"></small>
+
+                </div>
+
+
+                <!-- Name -->
+
+                <div class="account-form-group">
+
+                    <label for="accountName">
+
+                        Full Name
+
+                        <span>*</span>
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="accountName"
+                        placeholder="Enter full name"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+
+                <!-- Email -->
+
+                <div class="account-form-group">
+
+                    <label for="accountEmail">
+
+                        Email Address
+
+                        <span>*</span>
+
+                    </label>
+
+                    <input
+                        type="email"
+                        id="accountEmail"
+                        placeholder="Enter email address"
+                        autocomplete="off"
+                    >
+
+                    <small id="accountEmailMessage"></small>
+
+                </div>
+
+
+                <!-- Mobile -->
+
+                <div class="account-form-group">
+
+                    <label for="accountMobile">
+
+                        Mobile Number
+
+                        <span>*</span>
+
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="accountMobile"
+                        placeholder="Enter mobile number"
+                        autocomplete="off"
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- Information Message -->
+
+            <div class="account-info-message">
+
+                <i class="fa-solid fa-circle-info"></i>
+
+                <span>
+                    If you change your User ID or Email, you will need
+                    to use the new details for login next time.
+                </span>
+
+            </div>
+
+
+            <!-- Save -->
+
+            <div class="account-card-footer">
+
+                <button
+                    type="button"
+                    id="btnSaveProfile"
+                    class="account-primary-btn"
+                >
+
+                    <i class="fa-solid fa-floppy-disk"></i>
+
+                    Save Profile
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- =====================================
+             ACCOUNT INFORMATION
+        ====================================== -->
+
+        <div class="account-card">
+
+            <div class="account-card-header">
+
+                <div class="account-card-icon">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                </div>
+
+                <div>
+
+                    <h2>
+                        Account Information
+                    </h2>
+
+                    <p>
+                        Your account role and status
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="account-form-grid">
+
+
+                <!-- Role -->
+
+                <div class="account-form-group">
+
+                    <label for="accountRole">
+                        Role
+                    </label>
+
+                    <div class="account-readonly-wrapper">
+
+                        <input
+                            type="text"
+                            id="accountRole"
+                            readonly
+                        >
+
+                        <i class="fa-solid fa-lock"></i>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Status -->
+
+                <div class="account-form-group">
+
+                    <label for="accountStatus">
+                        Status
+                    </label>
+
+                    <div class="account-readonly-wrapper">
+
+                        <input
+                            type="text"
+                            id="accountStatus"
+                            readonly
+                        >
+
+                        <i class="fa-solid fa-lock"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Admin Control Notice -->
+
+            <div class="account-security-notice">
+
+                <div class="notice-icon">
+
+                    <i class="fa-solid fa-lock"></i>
+
+                </div>
+
+                <div>
+
+                    <strong>
+                        Role and Status are managed by administrators
+                    </strong>
+
+                    <p>
+                        You cannot change your account role or status
+                        from this page.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         CHANGE PASSWORD
+    ========================================== -->
+
+    <div class="account-card account-password-card">
+
+        <div class="account-card-header">
+
+            <div class="account-card-icon">
+
+                <i class="fa-solid fa-key"></i>
+
+            </div>
+
+            <div>
+
+                <h2>
+                    Change Password
+                </h2>
+
+                <p>
+                    Keep your account secure by using a strong password
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="password-section">
+
+
+            <div class="password-display">
+
+                <label>
+                    Password
+                </label>
+
+                <div class="password-input-wrapper">
+
+                    <input
+                        type="password"
+                        id="accountPassword"
+                        value="••••••••••••••••"
+                        readonly
+                    >
+
+                    <button
+                        type="button"
+                        id="btnShowPassword"
+                        title="Show password"
+                    >
+
+                        <i class="fa-solid fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="btnChangePassword"
+                class="account-outline-btn"
+            >
+
+                <i class="fa-solid fa-lock"></i>
+
+                Change Password
+
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================================
+         SECURITY TIP
+    ========================================== -->
+
+    <div class="account-security-tip">
+
+        <div>
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+        </div>
+
+        <p>
+
+            <strong>
+                Security Tip:
+            </strong>
+
+            Never share your account details with anyone.
+            Keep your password strong and secure.
+
+        </p>
+
+    </div>
+
+
+</div>
+
+
+<!-- =========================================
+     CHANGE PASSWORD MODAL
+========================================== -->
+
+<div
+    id="changePasswordModal"
+    class="account-modal"
+    style="display:none;"
+>
+
+    <div class="account-modal-overlay"></div>
+
+
+    <div class="account-modal-content">
+
+
+        <!-- Modal Header -->
+
+        <div class="account-modal-header">
+
+            <div>
+
+                <div class="account-modal-icon">
+
+                    <i class="fa-solid fa-key"></i>
+
+                </div>
+
+                <div>
+
+                    <h2>
+                        Change Password
+                    </h2>
+
+                    <p>
+                        Update your account password
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <button
+                type="button"
+                id="closePasswordModal"
+                class="account-modal-close"
+            >
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+        <!-- Modal Body -->
+
+        <div class="account-modal-body">
+
+
+            <!-- Current Password -->
+
+            <div class="account-form-group">
+
+                <label for="currentPassword">
+
+                    Current Password
+
+                    <span>*</span>
+
+                </label>
+
+                <div class="password-input-wrapper">
+
+                    <input
+                        type="password"
+                        id="currentPassword"
+                        placeholder="Enter current password"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="currentPassword"
+                    >
+
+                        <i class="fa-solid fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- New Password -->
+
+            <div class="account-form-group">
+
+                <label for="newPassword">
+
+                    New Password
+
+                    <span>*</span>
+
+                </label>
+
+                <div class="password-input-wrapper">
+
+                    <input
+                        type="password"
+                        id="newPassword"
+                        placeholder="Enter new password"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="newPassword"
+                    >
+
+                        <i class="fa-solid fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Confirm Password -->
+
+            <div class="account-form-group">
+
+                <label for="confirmPassword">
+
+                    Confirm New Password
+
+                    <span>*</span>
+
+                </label>
+
+                <div class="password-input-wrapper">
+
+                    <input
+                        type="password"
+                        id="confirmPassword"
+                        placeholder="Confirm new password"
+                    >
+
+                    <button
+                        type="button"
+                        class="password-toggle"
+                        data-target="confirmPassword"
+                    >
+
+                        <i class="fa-solid fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Password Rules -->
+
+            <div class="password-rules">
+
+                <p>
+                    <i class="fa-solid fa-circle-info"></i>
+                    Make sure your new password is different from
+                    your current password.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- Modal Footer -->
+
+        <div class="account-modal-footer">
+
+            <button
+                type="button"
+                id="btnCancelPassword"
+                class="account-secondary-btn"
+            >
+                Cancel
+            </button>
+
+            <button
+                type="button"
+                id="btnSavePassword"
+                class="account-primary-btn"
+            >
+
+                <i class="fa-solid fa-lock"></i>
+
+                Change Password
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
