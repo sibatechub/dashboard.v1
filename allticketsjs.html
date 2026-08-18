@@ -216,21 +216,32 @@ function renderTicketTable(){
 
         </button>
 
-        ${
-            String(ticket.status || "").toUpperCase() !== "CLOSED"
-            ? `
-            <!-- UPDATE -->
-            <button
-                class="all-ticket-action-btn all-ticket-update-btn btn-technician-update"
-                data-ticket="${ticket.ticketNo}"
-                title="Update Ticket">
+<!-- COMPUTER DETAILS -->
+<button
+    class="all-ticket-action-btn all-ticket-asset-btn btn-asset-details"
+    data-ticket="${ticket.ticketNo}"
+    title="Computer Details">
 
-                <i class="fa-solid fa-screwdriver-wrench"></i>
+    <i class="fa-solid fa-desktop"></i>
 
-            </button>
-            `
-            : ""
-        }
+</button>
+
+
+${
+    String(ticket.status || "").toUpperCase() !== "CLOSED"
+    ? `
+    <!-- UPDATE -->
+    <button
+        class="all-ticket-action-btn all-ticket-update-btn btn-technician-update"
+        data-ticket="${ticket.ticketNo}"
+        title="Update Ticket">
+
+        <i class="fa-solid fa-screwdriver-wrench"></i>
+
+    </button>
+    `
+    : ""
+}
 
     </div>
 
@@ -663,6 +674,28 @@ document.addEventListener("click", function(e){
     openTechnicianUpdate(ticketNo);
 
 });
+/* ==========================================================
+   COMPUTER DETAILS BUTTON
+========================================================== */
+
+document.addEventListener("click", function(e){
+
+    const btn =
+        e.target.closest(".btn-asset-details");
+
+    if(!btn) return;
+
+
+    const ticketNo =
+        btn.dataset.ticket;
+
+
+    if(!ticketNo) return;
+
+
+    openComputerDetails(ticketNo);
+
+});
 document.addEventListener("click", function(e) {
 
     const btn = e.target.closest("#btnExcel");
@@ -765,6 +798,113 @@ function openTechnicianUpdate(ticketNo) {
         .getTechnicianUpdateLink(
             getSessionToken(),
             ticketNo
+        );
+
+}
+/* ==========================================================
+   COMPUTER DETAILS
+========================================================== */
+
+function openComputerDetails(ticketNo) {
+
+    if (!ticketNo) {
+        return;
+    }
+
+
+    Swal.fire({
+
+        title: "Opening Computer Details",
+
+        text: "Please wait...",
+
+        allowOutsideClick: false,
+
+        didOpen: () => {
+
+            Swal.showLoading();
+
+        }
+
+    });
+
+
+    google.script.run
+
+        .withSuccessHandler(function(result) {
+
+            Swal.close();
+
+
+            if (!result || !result.success) {
+
+                Swal.fire({
+
+                    icon: "warning",
+
+                    title: "Computer Details Not Available",
+
+                    text:
+                        result?.message ||
+                        "Unable to find computer details.",
+
+                    confirmButtonColor: "#2E2278",
+
+                    heightAuto: false,
+
+                    scrollbarPadding: false
+
+                });
+
+                return;
+
+            }
+
+
+            // =========================================
+            // OPEN SAME COMPUTER LINK USED IN EMAIL
+            // =========================================
+
+            window.open(
+                result.formUrl,
+                "_blank"
+            );
+
+        })
+
+
+        .withFailureHandler(function(error) {
+
+            Swal.close();
+
+
+            Swal.fire({
+
+                icon: "error",
+
+                title: "Unable to Open",
+
+                text:
+                    error.message ||
+                    "Something went wrong.",
+
+                confirmButtonColor: "#2E2278",
+
+                heightAuto: false,
+
+                scrollbarPadding: false
+
+            });
+
+        })
+
+
+        .getComputerDetailsLink(
+
+            getSessionToken(),
+
+            ticketNo
+
         );
 
 }
