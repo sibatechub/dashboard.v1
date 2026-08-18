@@ -1,0 +1,852 @@
+<script>
+
+
+// ==============================
+// Show / Hide Password
+// ==============================
+
+
+const eye = document.querySelector(".eye");
+const password = document.getElementById("password");
+
+
+eye.addEventListener("click", function () {
+
+
+ if (password.type === "password") {
+
+
+   password.type = "text";
+   eye.classList.replace("fa-eye", "fa-eye-slash");
+
+
+ } else {
+
+
+   password.type = "password";
+   eye.classList.replace("fa-eye-slash", "fa-eye");
+
+
+ }
+
+
+});
+function showSuccess(title, text){
+
+
+ Swal.fire({
+   icon: 'success',
+   title: title,
+   text: text,
+   confirmButtonColor: '#2E2278',
+   heightAuto: false,
+   scrollbarPadding: false
+ });
+
+
+}
+
+
+function showError(title, text){
+
+
+ Swal.fire({
+   icon: 'error',
+   title: title,
+   text: text,
+   confirmButtonColor: '#2E2278',
+   heightAuto: false,
+   scrollbarPadding: false
+ });
+
+
+}
+
+
+function showWarning(title, text){
+
+
+ Swal.fire({
+   icon: 'warning',
+   title: title,
+   text: text,
+   confirmButtonColor: '#E1A855',
+   heightAuto: false,
+   scrollbarPadding: false
+ });
+
+
+}
+
+
+
+
+// ==============================
+// Login
+// ==============================
+
+
+function login() {
+
+
+ const email = document.getElementById("email").value.trim();
+ const password = document.getElementById("password").value.trim();
+
+
+if(email==""){
+
+
+   showWarning("Required", "Please enter Email or User ID");
+   return;
+
+
+}
+
+
+if(password==""){
+
+
+   showWarning("Required", "Please enter Password");
+   return;
+
+
+}
+
+
+ const btn = document.querySelector(".login-btn");
+
+
+ btn.disabled = true;
+
+
+ btn.innerHTML =
+ "<i class='fa fa-spinner fa-spin'></i> Signing In...";
+
+
+ google.script.run
+
+
+.withSuccessHandler(function(res){
+
+    if(!res.success){
+
+        btn.disabled = false;
+        btn.innerHTML = "Login";
+        showError("Login Failed", res.message);
+        return;
+
+    }
+
+    // ===============================
+    // Debug Information
+    // ===============================
+    console.log("NEW TOKEN:", res.token);
+    console.log("USER:", res.name);
+    console.log("ROLE:", res.role);
+
+    // ===============================
+    // Save New Session
+    // ===============================
+sessionStorage.removeItem("sessionToken");
+sessionStorage.setItem("sessionToken", res.token);
+
+    btn.innerHTML =
+    "<i class='fa fa-spinner fa-spin'></i> Opening Dashboard...";
+
+    // ===============================
+    // Dashboard URL
+    // ===============================
+    const webAppUrl =
+    "https://script.google.com/a/macros/driems.ac.in/s/AKfycbyrpGmpIamoP6L1L5gkKurk7M-JF6fcBXr7osKK_8NI57D1glVlKRWFfY7LsRqcAIE/exec";
+
+    const redirectUrl =
+        webAppUrl +
+        "?page=dashboard&token=" +
+        encodeURIComponent(res.token) +
+        "&t=" +
+        Date.now();
+
+    console.log("Redirect URL:", redirectUrl);
+
+    // ===============================
+    // Force Browser Reload
+    // ===============================
+    window.top.location.replace(redirectUrl);
+
+})
+
+
+ .withFailureHandler(function(err){
+
+
+     btn.disabled=false;
+
+
+     btn.innerHTML="Login";
+
+
+     showError("Error", err.message);
+
+
+ })
+
+
+ .loginUser(email,password);
+
+
+}
+
+
+
+
+// ==============================
+// Button Click
+// ==============================
+
+
+document.querySelector(".login-btn")
+
+
+.addEventListener("click",login);
+
+
+// ==============================
+// SIGNUP MODAL
+// ==============================
+
+
+const signupModal = document.getElementById("signupModal");
+
+
+const signupLink = document.getElementById("signupLink");
+
+
+const closeSignup = document.querySelector(".close");
+
+
+signupLink.onclick = function(e){
+
+
+   e.preventDefault();
+
+
+   signupModal.style.display = "flex";
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(roles){
+
+
+       const role = document.getElementById("su_role");
+
+
+       // Reset dropdown
+       role.innerHTML = '<option value="">Select Role</option>';
+
+
+       roles.forEach(function(r){
+
+
+           role.innerHTML += `<option value="${r}">${r}</option>`;
+
+
+       });
+
+
+   })
+
+
+   .getRoles();
+
+
+}
+
+
+closeSignup.onclick = function(){
+
+
+   signupModal.style.display = "none";
+
+
+}
+
+
+window.onclick = function(event){
+
+
+   if(event.target==signupModal){
+
+
+       signupModal.style.display="none";
+
+
+   }
+
+
+}
+// ==============================
+// CREATE ACCOUNT
+// ==============================
+
+
+document.getElementById("createAccountBtn").addEventListener("click", createAccount);
+
+
+function createAccount(){
+
+
+   const name = document.getElementById("su_name").value.trim();
+   const userId = document.getElementById("su_userid").value.trim();
+   const email = document.getElementById("su_email").value.trim();
+   const mobile = document.getElementById("su_mobile").value.trim();
+   const role = document.getElementById("su_role").value;
+   const password = document.getElementById("su_password").value;
+   const confirm = document.getElementById("su_confirm").value;
+
+
+   if(name==""){
+       showWarning("Required","Please enter Full Name");
+       return;
+   }
+
+
+   if(userId==""){
+       showWarning("Required","Please enter User ID");
+       return;
+   }
+
+
+   if(email==""){
+       showWarning("Required","Please enter Email");
+       return;
+   }
+
+
+   if(mobile==""){
+       showWarning("Required","Please enter Mobile Number");
+       return;
+   }
+   if(role==""){
+   showWarning("Required","Please select Role");
+   return;
+}
+
+
+   if(password==""){
+       showWarning("Required","Please enter Password");
+       return;
+   }
+
+
+   if(confirm==""){
+       showWarning("Required","Please confirm Password");
+       return;
+   }
+
+
+   if(password!=confirm){
+
+
+       showError("Password Mismatch","Password and Confirm Password must be same.");
+
+
+       return;
+
+
+   }
+
+
+   const btn=document.getElementById("createAccountBtn");
+
+
+   btn.disabled=true;
+
+
+   btn.innerHTML="<i class='fa fa-spinner fa-spin'></i> Creating...";
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(res){
+
+
+       btn.disabled=false;
+
+
+       btn.innerHTML="Create Account";
+
+
+       if(!res.success){
+
+
+           showError("Failed",res.message);
+
+
+           return;
+
+
+       }
+
+
+       showSuccess(
+           "Request Submitted",
+           "Your account request has been submitted successfully. Please wait for administrator approval."
+       );
+
+
+       document.getElementById("su_name").value="";
+       document.getElementById("su_userid").value="";
+       document.getElementById("su_email").value="";
+       document.getElementById("su_mobile").value="";
+       document.getElementById("su_password").value="";
+       document.getElementById("su_confirm").value="";
+
+
+       signupModal.style.display="none";
+
+
+   })
+
+
+   .withFailureHandler(function(err){
+
+
+       btn.disabled=false;
+
+
+       btn.innerHTML="Create Account";
+
+
+       showError("Error",err.message);
+
+
+   })
+
+
+.createAccount({
+
+
+   name:name,
+
+
+   userId:userId,
+
+
+   email:email,
+
+
+   mobile:mobile,
+
+
+   role:role,
+
+
+   password:password
+
+
+});
+
+
+}
+// ===============================
+// FORGOT PASSWORD POPUP
+// ===============================
+
+
+const forgotModal = document.getElementById("forgotModal");
+
+
+const forgotBtn = document.getElementById("forgotBtn");
+
+
+const closeForgot = document.querySelector(".closeForgot");
+
+
+forgotBtn.onclick = function(e){
+
+
+   e.preventDefault();
+
+
+   // Reset to Step 1 every time
+   document.getElementById("forgotTitle").innerHTML = "Forgot Password";
+
+
+   document.getElementById("forgotSubtitle").innerHTML =
+   "Enter your registered Email or User ID.";
+
+
+   document.getElementById("forgotStep1").style.display = "block";
+   document.getElementById("forgotStep2").style.display = "none";
+
+
+   // Clear all fields
+   document.getElementById("fp_user").value = "";
+   document.getElementById("fp_otp").value = "";
+   document.getElementById("fp_newPassword").value = "";
+   document.getElementById("fp_confirmPassword").value = "";
+
+
+   // Enable button again
+   const btn = document.getElementById("sendOtpBtn");
+   btn.disabled = false;
+   btn.innerHTML = "Send OTP";
+
+
+   forgotModal.style.display = "flex";
+
+
+}
+
+
+closeForgot.onclick = function(){
+
+
+   forgotModal.style.display="none";
+
+
+}
+
+
+window.addEventListener("click",function(e){
+
+
+   if(e.target==forgotModal){
+
+
+       forgotModal.style.display="none";
+
+
+   }
+
+
+});
+//=====================================
+// SEND OTP
+//=====================================
+
+
+document.getElementById("sendOtpBtn")
+
+
+.addEventListener("click", sendOTP);
+
+
+function sendOTP(){
+
+
+   const user=document.getElementById("fp_user").value.trim();
+
+
+   if(user==""){
+
+
+       showWarning(
+           "Required",
+           "Please enter Email or User ID."
+       );
+
+
+       return;
+
+
+   }
+
+
+   const btn=document.getElementById("sendOtpBtn");
+
+
+   btn.disabled=true;
+
+
+   btn.innerHTML="<i class='fa fa-spinner fa-spin'></i> Sending...";
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(res){
+
+
+       btn.disabled=false;
+
+
+       btn.innerHTML="Send OTP";
+
+
+if(!res.success){
+
+
+   // Close Forgot Password popup
+   forgotModal.style.display = "none";
+
+
+   showError(
+       "Failed",
+       res.message
+   );
+
+
+   return;
+
+
+}
+
+
+document.getElementById("forgotTitle").innerHTML = "Verify OTP";
+
+
+document.getElementById("forgotSubtitle").innerHTML =
+"Enter the OTP sent to your Email and create a new password.";
+
+
+document.getElementById("forgotStep1").style.display = "none";
+
+
+document.getElementById("forgotStep2").style.display = "block";
+
+
+// Show message after the UI changes
+// Show Success Message Inside Popup
+const msg = document.getElementById("otpMessage");
+
+
+msg.style.display = "block";
+
+
+msg.innerHTML =
+"<i class='fa-solid fa-circle-check'></i> OTP has been sent to your registered email.";
+
+
+       // Next Step
+       // Here we'll change popup into OTP Verification
+
+
+   })
+
+
+   .withFailureHandler(function(err){
+
+
+       btn.disabled=false;
+
+
+       btn.innerHTML="Send OTP";
+
+
+       showError(
+           "Error",
+           err.message
+       );
+
+
+   })
+
+
+   .sendOTP(user);
+
+
+}
+//=====================================
+// BACK TO FORGOT PASSWORD
+//=====================================
+
+
+document.getElementById("backForgot").onclick = function(e){
+
+
+   e.preventDefault();
+   Swal.close();
+
+
+   document.getElementById("forgotTitle").innerHTML = "Forgot Password";
+
+
+   document.getElementById("forgotSubtitle").innerHTML =
+   "Enter your registered Email or User ID.";
+
+
+   document.getElementById("forgotStep1").style.display = "block";
+
+
+   document.getElementById("forgotStep2").style.display = "none";
+   document.getElementById("otpMessage").style.display = "none";
+
+
+   // Clear OTP fields
+   document.getElementById("fp_otp").value = "";
+   document.getElementById("fp_newPassword").value = "";
+   document.getElementById("fp_confirmPassword").value = "";
+
+
+}
+//=====================================
+// RESET PASSWORD
+//=====================================
+
+
+document.getElementById("resetPasswordBtn")
+.addEventListener("click", resetPassword);
+
+
+function resetPassword(){
+
+
+   const user = document.getElementById("fp_user").value.trim();
+   const otp = document.getElementById("fp_otp").value.trim();
+   const newPassword = document.getElementById("fp_newPassword").value;
+   const confirmPassword = document.getElementById("fp_confirmPassword").value;
+
+
+   if(otp==""){
+
+
+       showWarning(
+           "Required",
+           "Please enter OTP."
+       );
+
+
+       return;
+
+
+   }
+
+
+   if(newPassword==""){
+
+
+       showWarning(
+           "Required",
+           "Please enter New Password."
+       );
+
+
+       return;
+
+
+   }
+
+
+   if(confirmPassword==""){
+
+
+       showWarning(
+           "Required",
+           "Please confirm Password."
+       );
+
+
+       return;
+
+
+   }
+
+
+   if(newPassword!=confirmPassword){
+
+
+       showError(
+           "Password Mismatch",
+           "Passwords do not match."
+       );
+
+
+       return;
+
+
+   }
+
+
+   const btn=document.getElementById("resetPasswordBtn");
+
+
+   btn.disabled=true;
+
+
+   btn.innerHTML="<i class='fa fa-spinner fa-spin'></i> Updating...";
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(res){
+
+
+       btn.disabled=false;
+
+
+       btn.innerHTML="Reset Password";
+
+
+       if(!res.success){
+
+
+           showError(
+               "Failed",
+               res.message
+           );
+
+
+           return;
+
+
+       }
+
+
+       forgotModal.style.display="none";
+
+
+       showSuccess(
+           "Success",
+           "Password changed successfully."
+       );
+
+
+       // Clear everything
+       document.getElementById("fp_user").value="";
+       document.getElementById("fp_otp").value="";
+       document.getElementById("fp_newPassword").value="";
+       document.getElementById("fp_confirmPassword").value="";
+
+
+   })
+
+
+   .withFailureHandler(function(err){
+
+
+       btn.disabled=false;
+
+
+       btn.innerHTML="Reset Password";
+
+
+       showError(
+           "Error",
+           err.message
+       );
+
+
+   })
+
+
+   .resetPassword(
+       user,
+       otp,
+       newPassword
+   );
+
+
+}
+
+
+</script>
+
+
+
+
+
