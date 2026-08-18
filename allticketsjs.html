@@ -1,0 +1,1302 @@
+<script>
+
+/* ==========================================================
+   DRIEMS IT Dashboard
+   All Tickets Module - Part A
+   State + Load + Render
+========================================================== */
+
+/* ==========================================================
+   GLOBAL STATE
+========================================================== */
+
+const ticketState = {
+
+    allTickets: [],
+    filteredTickets: [],
+    isLoaded: false
+
+};
+
+
+/* ==========================================================
+   INITIALIZE
+========================================================== */
+
+function initializeTickets(){
+
+    if(ticketState.isLoaded) return;
+
+    loadAllTickets();
+
+}
+
+
+/* ==========================================================
+   LOAD ALL TICKETS
+========================================================== */
+
+function loadAllTickets(){
+
+    console.log("Loading Tickets...");
+
+    google.script.run
+
+        .withSuccessHandler(onTicketsLoaded)
+
+        .withFailureHandler(function(error){
+
+            console.error(error);
+
+            Swal.fire({
+
+                icon: "error",
+                title: "Backend Error",
+                text: error.message
+
+            });
+
+        })
+
+        .getAllTickets(getSessionToken());
+
+}
+
+
+/* ==========================================================
+   BACKEND SUCCESS
+========================================================== */
+
+function onTicketsLoaded(data){
+
+    console.log("Backend Response :", data);
+
+    if(!Array.isArray(data)){
+
+        console.error("Backend returned invalid data.", data);
+
+        Swal.fire({
+
+            icon:"error",
+            title:"Invalid Data",
+            text:"Backend did not return an array."
+
+        });
+
+        return;
+
+    }
+
+ticketState.allTickets = [...data].sort(function(a, b) {
+    return new Date(b.timestamp) - new Date(a.timestamp);
+});
+
+ticketState.filteredTickets = [...ticketState.allTickets];
+
+ticketState.isLoaded = true;
+
+loadBuildingFilter();
+
+loadTechnicianFilter();
+
+updateTicketCounter();
+
+renderTicketTable();
+
+}
+
+
+/* ==========================================================
+   UPDATE COUNTER
+========================================================== */
+
+function updateTicketCounter(){
+
+    document.getElementById("ticketCount").innerText =
+        ticketState.allTickets.length;
+
+    document.getElementById("showingTickets").innerText =
+        ticketState.filteredTickets.length;
+
+}
+
+
+/* ==========================================================
+   RENDER TABLE
+========================================================== */
+
+function renderTicketTable(){
+
+    const tbody = document.getElementById("ticketTableBody");
+
+    if(!tbody){
+
+        console.error("ticketTableBody not found.");
+
+        return;
+
+    }
+
+    tbody.innerHTML = "";
+
+    if(ticketState.filteredTickets.length===0){
+
+        tbody.innerHTML = `
+
+        <tr>
+
+            <td colspan="10">
+
+                <div class="empty-state">
+
+                    <i class="fa-solid fa-ticket"></i>
+
+                    <h3>No Tickets Found</h3>
+
+                    <p>Tickets will appear here once data is loaded.</p>
+
+                </div>
+
+            </td>
+
+        </tr>
+
+        `;
+
+        updateTicketCounter();
+
+        return;
+
+    }
+
+
+    ticketState.filteredTickets.forEach(function(ticket){
+
+        const row=document.createElement("tr");
+
+        row.innerHTML=`
+
+            <td>${ticket.ticketNo ?? ""}</td>
+
+            <td>${ticket.status ?? ""}</td>
+
+            <td>${ticket.priority ?? ""}</td>
+
+            <td>${ticket.faculty ?? ""}</td>
+
+            <td>${ticket.building ?? ""}</td>
+
+            <td>${ticket.room ?? ""}</td>
+
+            <td title="${ticket.problem ?? ""}">
+    ${
+        ticket.problem
+            ? (ticket.problem.length > 40
+                ? ticket.problem.substring(0,40) + "..."
+                : ticket.problem)
+            : ""
+    }
+</td>
+
+            <td>${ticket.technician ?? ""}</td>
+
+            <td>${formatDate(ticket.timestamp)}</td>
+
+<td>
+
+    <div class="all-ticket-actions">
+
+        <!-- VIEW -->
+        <button
+            class="all-ticket-action-btn all-ticket-view-btn btn-view"
+            data-ticket="${ticket.ticketNo}"
+            title="View Ticket">
+
+            <i class="fa-solid fa-eye"></i>
+
+        </button>
+
+        ${
+            String(ticket.status || "").toUpperCase() !== "CLOSED"
+            ? `
+            <!-- UPDATE -->
+            <button
+                class="all-ticket-action-btn all-ticket-update-btn btn-technician-update"
+                data-ticket="${ticket.ticketNo}"
+                title="Update Ticket">
+
+                <i class="fa-solid fa-screwdriver-wrench"></i>
+
+            </button>
+            `
+            : ""
+        }
+
+    </div>
+
+</td>
+
+        `;
+
+        tbody.appendChild(row);
+
+    });
+
+    updateTicketCounter();
+
+}
+
+
+/* ==========================================================
+   FORMAT DATE
+========================================================== */
+
+function formatDate(value){
+
+    if(!value) return "";
+
+    try{
+
+        const date = new Date(value);
+
+        if(isNaN(date)) return value;
+
+        return date.toLocaleDateString("en-IN");
+
+    }
+    catch(e){
+
+        return value;
+
+    }
+
+}
+
+
+/* ==========================================================
+   REFRESH BUTTON
+========================================================== */
+
+/* ==========================================================
+   REFRESH TICKETS
+========================================================== */
+
+document.getElementById("btnRefreshTicket").addEventListener("click", function () {
+
+    const btn = this;
+
+    // Show loading
+    btn.disabled = true;
+    btn.innerHTML = `
+        <i class="fa-solid fa-spinner fa-spin"></i>
+        Refreshing...
+    `;
+
+    // Reset loaded state
+    ticketState.isLoaded = false;
+
+    // Reload latest tickets
+    google.script.run
+        .withSuccessHandler(function(data){
+
+            onTicketsLoaded(data);
+
+            // Restore button
+            btn.disabled = false;
+            btn.innerHTML = `
+                <i class="fa-solid fa-arrows-rotate"></i>
+                Refresh
+            `;
+
+            Swal.fire({
+                icon: "success",
+                title: "Refreshed",
+                text: "Latest tickets loaded successfully.",
+                timer: 1200,
+                showConfirmButton: false
+            });
+
+        })
+        .withFailureHandler(function(error){
+
+            btn.disabled = false;
+            btn.innerHTML = `
+                <i class="fa-solid fa-arrows-rotate"></i>
+                Refresh
+            `;
+
+            Swal.fire({
+                icon: "error",
+                title: "Refresh Failed",
+                text: error.message
+            });
+
+        })
+        .getAllTickets(getSessionToken());
+
+});
+/* ==========================================================
+   DRIEMS IT Dashboard
+   All Tickets Module - Part B
+   Search + Filters + Reset
+========================================================== */
+
+
+/* ==========================================================
+   APPLY FILTERS
+========================================================== */
+
+function applyTicketFilters(){
+
+    let search =
+        document.getElementById("searchTicket").value
+        .trim()
+        .toLowerCase();
+
+let building =
+    document.getElementById("ticketFilterBuilding").value;
+
+let technician =
+    document.getElementById("ticketFilterTechnician").value;
+
+    let status =
+        document.getElementById("filterStatus").value;
+
+    let priority =
+        document.getElementById("filterPriority").value;
+
+let fromDate =
+    document.getElementById("ticketFilterFromDate").value;
+
+let toDate =
+    document.getElementById("ticketFilterToDate").value;
+
+
+    ticketState.filteredTickets = ticketState.allTickets.filter(function(ticket){
+
+        // ---------------- SEARCH ----------------
+
+        let matchSearch = true;
+
+        if(search){
+
+            const text = [
+
+                ticket.ticketNo,
+                ticket.faculty,
+                ticket.mobile,
+                ticket.assetNo,
+                ticket.building,
+                ticket.technician,
+                ticket.room,
+                ticket.email
+
+            ].join(" ").toLowerCase();
+
+            matchSearch = text.includes(search);
+
+        }
+
+
+        // ---------------- BUILDING ----------------
+
+        const matchBuilding =
+            !building || ticket.building === building;
+
+
+        // ---------------- TECHNICIAN ----------------
+
+        const matchTechnician =
+            !technician || ticket.technician === technician;
+
+
+        // ---------------- STATUS ----------------
+
+        const matchStatus =
+            !status || ticket.status === status;
+
+
+        // ---------------- PRIORITY ----------------
+
+        const matchPriority =
+            !priority || ticket.priority === priority;
+
+
+        // ---------------- DATE ----------------
+
+let matchDate = true;
+
+if (ticket.timestamp) {
+
+    const d = new Date(ticket.timestamp);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    const ticketDate = `${year}-${month}-${day}`;
+
+    if (fromDate && ticketDate < fromDate) {
+        matchDate = false;
+    }
+
+    if (toDate && ticketDate > toDate) {
+        matchDate = false;
+    }
+
+}
+
+
+        return (
+
+            matchSearch &&
+            matchBuilding &&
+            matchTechnician &&
+            matchStatus &&
+            matchPriority &&
+            matchDate
+
+        );
+
+    });
+
+
+    updateTicketCounter();
+
+    renderTicketTable();
+
+}
+
+
+/* ==========================================================
+   RESET FILTERS
+========================================================== */
+
+function resetTicketFilters(){
+
+    document.getElementById("searchTicket").value="";
+
+    document.getElementById("ticketFilterFromDate").value="";
+document.getElementById("ticketFilterToDate").value="";
+
+    document.getElementById("ticketFilterBuilding").value="";
+
+    document.getElementById("ticketFilterTechnician").value="";
+
+    document.getElementById("filterStatus").value="";
+
+    document.getElementById("filterPriority").value="";
+
+
+    ticketState.filteredTickets=[...ticketState.allTickets];
+
+    updateTicketCounter();
+
+    renderTicketTable();
+
+}
+
+
+/* ==========================================================
+   LOAD BUILDING FILTER
+========================================================== */
+
+function loadBuildingFilter(){
+
+    const select=document.getElementById("ticketFilterBuilding");
+
+    if(!select) return;
+
+    select.innerHTML='<option value="">🏢 All Buildings</option>';
+
+    const buildings=[
+
+        ...new Set(
+
+            ticketState.allTickets
+            .map(t=>t.building)
+            .filter(Boolean)
+
+        )
+
+    ].sort();
+
+
+    buildings.forEach(function(name){
+
+        const option=document.createElement("option");
+
+        option.value=name;
+
+        option.textContent=name;
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+/* ==========================================================
+   LOAD TECHNICIAN FILTER
+========================================================== */
+
+function loadTechnicianFilter(){
+
+    const select=document.getElementById("ticketFilterTechnician");
+
+    if(!select) return;
+
+    select.innerHTML='<option value="">👨 All Technicians</option>';
+
+    const technicians=[
+
+        ...new Set(
+
+            ticketState.allTickets
+            .map(t=>t.technician)
+            .filter(Boolean)
+
+        )
+
+    ].sort();
+
+
+    technicians.forEach(function(name){
+
+        const option=document.createElement("option");
+
+        option.value=name;
+
+        option.textContent=name;
+
+        select.appendChild(option);
+
+    });
+
+}
+
+
+/* ==========================================================
+   AFTER BACKEND LOAD
+========================================================== */
+
+/*
+Add these TWO lines at the END of
+onTicketsLoaded()
+
+loadBuildingFilter();
+
+loadTechnicianFilter();
+*/
+
+
+/* ==========================================================
+   EVENTS
+========================================================== */
+
+document.addEventListener("DOMContentLoaded",function(){
+
+    document.getElementById("searchTicket")
+    .addEventListener("keyup",applyTicketFilters);
+
+document.getElementById("ticketFilterFromDate")
+.addEventListener("change",applyTicketFilters);
+
+document.getElementById("ticketFilterToDate")
+.addEventListener("change",applyTicketFilters);
+
+document.getElementById("ticketFilterBuilding")
+.addEventListener("change",applyTicketFilters);
+
+document.getElementById("ticketFilterTechnician")
+.addEventListener("change",applyTicketFilters);
+
+    document.getElementById("filterStatus")
+    .addEventListener("change",applyTicketFilters);
+
+    document.getElementById("filterPriority")
+    .addEventListener("change",applyTicketFilters);
+
+    document.getElementById("btnFilterTicket")
+    .addEventListener("click",applyTicketFilters);
+
+    document.getElementById("btnResetTicket")
+    .addEventListener("click",resetTicketFilters);
+
+});
+
+/* ==========================================================
+   DRIEMS IT Dashboard
+   All Tickets Module - Part C
+   View Ticket + Helpers + Pagination
+========================================================== */
+
+
+/* ==========================================================
+   VIEW TICKET
+========================================================== */
+
+document.addEventListener("click", function(e){
+
+    const btn = e.target.closest(".btn-view");
+
+    if(!btn) return;
+
+    viewTicket(btn.dataset.ticket);
+
+});
+/* ==========================================================
+   TECHNICIAN UPDATE BUTTON
+========================================================== */
+
+document.addEventListener("click", function(e){
+
+    const btn = e.target.closest(".btn-technician-update");
+
+    if(!btn) return;
+
+    const ticketNo = btn.dataset.ticket;
+
+    if(!ticketNo) return;
+
+    openTechnicianUpdate(ticketNo);
+
+});
+document.addEventListener("click", function(e) {
+
+    const btn = e.target.closest("#btnExcel");
+
+    if (!btn) return;
+
+    exportTicketsExcel();
+
+});
+document.addEventListener("click", function(e){
+
+    const btn = e.target.closest("#btnPDF");
+
+    if (!btn) return;
+
+    exportTicketsPDF();
+
+});
+
+
+function viewTicket(ticketNo){
+
+    console.log("Ticket :", ticketNo);
+    console.log("openTicketModal :", typeof openTicketModal);
+
+    if(!ticketNo) return;
+
+    openTicketModal(ticketNo);
+
+}
+/* ==========================================================
+   TECHNICIAN UPDATE
+========================================================== */
+
+function openTechnicianUpdate(ticketNo) {
+
+    if (!ticketNo) {
+        return;
+    }
+
+    Swal.fire({
+
+        title: "Opening Ticket Update",
+        text: "Please wait...",
+        allowOutsideClick: false,
+
+        didOpen: () => {
+            Swal.showLoading();
+        }
+
+    });
+
+    google.script.run
+
+        .withSuccessHandler(function(result) {
+
+            Swal.close();
+
+            if (!result || !result.success) {
+
+                Swal.fire({
+
+                    icon: "error",
+
+                    title: "Unable to Open",
+
+                    text:
+                        result?.message ||
+                        "Unable to generate update form."
+
+                });
+
+                return;
+
+            }
+
+            window.open(
+                result.formUrl,
+                "_blank"
+            );
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            Swal.close();
+
+            Swal.fire({
+
+                icon: "error",
+
+                title: "Update Failed",
+
+                text: error.message
+
+            });
+
+        })
+
+        .getTechnicianUpdateLink(
+            getSessionToken(),
+            ticketNo
+        );
+
+}
+
+
+/* ==========================================================
+   HELPER FUNCTIONS
+========================================================== */
+
+function escapeHTML(text){
+
+    if(text==null) return "";
+
+    return String(text)
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+
+}
+
+
+function getStatusBadge(status){
+
+    status = String(status || "").toUpperCase();
+
+    switch(status){
+
+        case "OPEN":
+            return '<span class="badge badge-open">OPEN</span>';
+
+        case "ACCEPTED":
+            return '<span class="badge badge-accepted">ACCEPTED</span>';
+
+        case "PENDING":
+            return '<span class="badge badge-pending">PENDING</span>';
+
+        case "REOPEN":
+            return '<span class="badge badge-reopen">REOPEN</span>';
+
+        case "CLOSED":
+            return '<span class="badge badge-closed">CLOSED</span>';
+
+        default:
+            return status;
+
+    }
+
+}
+
+
+function getPriorityBadge(priority){
+
+    priority = String(priority || "").toUpperCase();
+
+    switch(priority){
+
+        case "IMMEDIATE":
+            return '<span class="badge badge-immediate">IMMEDIATE</span>';
+
+        case "HIGH":
+            return '<span class="badge badge-high">HIGH</span>';
+
+        case "MEDIUM":
+            return '<span class="badge badge-medium">MEDIUM</span>';
+
+        case "LOW":
+            return '<span class="badge badge-low">LOW</span>';
+
+        default:
+            return priority;
+
+    }
+
+}
+
+
+/* ==========================================================
+   PAGINATION
+========================================================== */
+
+let currentPage = 1;
+
+const rowsPerPage = 10;
+
+
+function updatePagination(){
+
+    const totalRows = ticketState.filteredTickets.length;
+
+    const totalPages = Math.max(1, Math.ceil(totalRows / rowsPerPage));
+
+    document.getElementById("pageInfo").innerText =
+        "Page " + currentPage + " of " + totalPages;
+
+    document.getElementById("btnPrev").disabled =
+        currentPage === 1;
+
+    document.getElementById("btnNext").disabled =
+        currentPage === totalPages;
+
+}
+
+
+document.getElementById("btnPrev")?.addEventListener("click",function(){
+
+    if(currentPage>1){
+
+        currentPage--;
+
+        renderTicketTable();
+
+    }
+
+});
+
+
+document.getElementById("btnNext")?.addEventListener("click",function(){
+
+    const totalPages = Math.ceil(
+        ticketState.filteredTickets.length / rowsPerPage
+    );
+
+    if(currentPage<totalPages){
+
+        currentPage++;
+
+        renderTicketTable();
+
+    }
+
+});
+/* ==========================================================
+   PRINT FILTERED TICKETS
+========================================================== */
+
+document.addEventListener("click", function(e){
+
+    const btn = e.target.closest("#btnPrint");
+
+    if(!btn) return;
+
+    printTickets();
+
+});
+
+function printTickets(){
+
+    const rows = ticketState.filteredTickets;
+
+    if(rows.length === 0){
+
+        Swal.fire({
+            icon:"warning",
+            title:"No Records",
+            text:"There are no tickets to print."
+        });
+
+        return;
+
+    }
+
+    let tableRows = "";
+
+    rows.forEach(function(ticket){
+
+tableRows += `
+<tr>
+    <td>${ticket.ticketNo || ""}</td>
+    <td>${ticket.status || ""}</td>
+    <td>${ticket.priority || ""}</td>
+    <td>${ticket.faculty || ""}</td>
+    <td>${ticket.building || ""}</td>
+    <td>${ticket.room || ""}</td>
+    <td>${ticket.problem || ""}</td>
+    <td>${ticket.technician || ""}</td>
+    <td>${formatDate(ticket.timestamp)}</td>
+</tr>
+`;
+
+    });
+
+    const printWindow = window.open("", "_blank");
+
+    printWindow.document.write(`
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>All Tickets Report</title>
+
+<style>
+
+body{
+
+    font-family:Arial,sans-serif;
+    margin:30px;
+
+}
+
+h1{
+
+    text-align:center;
+    color:#2E2278;
+    margin-bottom:5px;
+
+}
+
+h3{
+
+    text-align:center;
+    margin-top:0;
+    color:#666;
+
+}
+
+.info{
+
+    margin:20px 0;
+    font-size:14px;
+
+}
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+    font-size:12px;
+
+}
+
+th{
+
+    background:#2E2278;
+    color:white;
+    padding:8px;
+    border:1px solid #ccc;
+
+}
+
+td{
+
+    padding:6px;
+    border:1px solid #ccc;
+
+}
+
+.footer{
+
+    margin-top:25px;
+    text-align:right;
+    font-size:12px;
+    color:#777;
+
+}
+@page{
+    size: A4 landscape;
+    margin: 12mm;
+}
+
+body{
+    font-family: Arial, sans-serif;
+    font-size:11px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    table-layout:fixed;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:6px;
+    word-wrap:break-word;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>DRIEMS IT Department</h1>
+
+<h3>All Tickets Report</h3>
+
+<div class="info">
+
+<b>Generated :</b> ${new Date().toLocaleString()}<br>
+
+<b>Total Tickets :</b> ${rows.length}
+
+</div>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>Ticket No</th>
+<th>Status</th>
+<th>Priority</th>
+<th>Faculty</th>
+<th>Building</th>
+<th>Room</th>
+<th>Problem</th>
+<th>Technician</th>
+<th>Date</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+${tableRows}
+
+</tbody>
+
+</table>
+
+<div class="footer">
+
+Generated from DRIEMS IT Dashboard
+
+</div>
+
+</body>
+
+</html>
+`);
+
+    printWindow.document.close();
+
+    printWindow.focus();
+
+    setTimeout(function(){
+
+        printWindow.print();
+
+        printWindow.close();
+
+    },500);
+
+}
+function exportTicketsExcel() {
+
+    const exportData = ticketState.filteredTickets;
+
+    if (!exportData || exportData.length === 0) {
+
+        Swal.fire({
+            icon: "warning",
+            title: "No Data",
+            text: "There are no tickets to export."
+        });
+
+        return;
+    }
+
+    Swal.fire({
+        title: "Preparing Excel...",
+        text: "Please wait...",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    google.script.run
+
+        .withSuccessHandler(function(result) {
+
+            Swal.close();
+
+            if (!result.success) {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Export Failed",
+                    text: "Unable to generate Excel."
+                });
+
+                return;
+            }
+
+            // Download Excel File
+            // =====================================
+// DOWNLOAD EXCEL DIRECTLY
+// =====================================
+
+const byteCharacters = atob(result.data);
+const byteNumbers = new Array(byteCharacters.length);
+
+for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+}
+
+const byteArray = new Uint8Array(byteNumbers);
+
+const blob = new Blob([byteArray], {
+    type: result.mimeType
+});
+
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+
+a.href = url;
+a.download = result.fileName;
+
+document.body.appendChild(a);
+
+a.click();
+
+document.body.removeChild(a);
+
+URL.revokeObjectURL(url);
+
+            Swal.fire({
+                icon: "success",
+                title: "Success",
+                text: "Excel exported successfully."
+            });
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            Swal.close();
+
+            Swal.fire({
+                icon: "error",
+                title: "Export Failed",
+                text: error.message
+            });
+
+        })
+
+        .exportTicketsToExcel(exportData);
+
+}
+function exportTicketsPDF() {
+
+    const exportData = ticketState.filteredTickets;
+
+    if (!exportData || exportData.length === 0) {
+
+        Swal.fire({
+            icon: "warning",
+            title: "No Data",
+            text: "There are no tickets to export."
+        });
+
+        return;
+    }
+
+    Swal.fire({
+        title: "Generating PDF...",
+        text: "Please wait...",
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    google.script.run
+        .withSuccessHandler(function(result) {
+
+            Swal.close();
+
+            if (result.success) {
+
+                const byteCharacters = atob(result.data);
+const byteNumbers = new Array(byteCharacters.length);
+
+for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+}
+
+const byteArray = new Uint8Array(byteNumbers);
+
+const blob = new Blob([byteArray], {
+    type: result.mimeType
+});
+
+const url = URL.createObjectURL(blob);
+
+const a = document.createElement("a");
+a.href = url;
+a.download = result.fileName;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+
+URL.revokeObjectURL(url);
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Success",
+                    text: "PDF exported successfully."
+                });
+
+            } else {
+
+                Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: result.message || "Unable to generate PDF."
+                });
+
+            }
+
+        })
+        .withFailureHandler(function(error) {
+
+            Swal.close();
+
+            Swal.fire({
+                icon: "error",
+                title: "Export Failed",
+                text: error.message
+            });
+
+        })
+        .exportTicketsToPDF(exportData);
+
+}
+
+
+</script>
+
