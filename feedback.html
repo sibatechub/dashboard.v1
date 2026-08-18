@@ -1,0 +1,329 @@
+<div class="feedback-page">
+
+        <!-- HEADER -->
+
+        <div class="feedback-header">
+
+                <h1>
+                    <i class="fa-solid fa-star"></i>
+                    Feedback
+                </h1>
+
+                <p>
+                    View and analyze user feedback and satisfaction
+                </p>
+
+            </div>
+
+
+        <!-- SUMMARY CARDS -->
+
+        <div class="feedback-summary-grid">
+
+
+            <!-- Overall Rating -->
+
+            <div class="feedback-summary-card">
+
+                <div class="feedback-icon rating-icon">
+
+                    <i class="fa-solid fa-star"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Overall Rating</span>
+
+                    <h2 id="feedbackOverallRating">
+                        0.00
+                    </h2>
+
+                    <p>
+                        Based on
+                        <b id="feedbackRatingCount">0</b>
+                        feedbacks
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Technician Behaviour -->
+
+            <div class="feedback-summary-card">
+
+                <div class="feedback-icon behaviour-icon">
+
+                    <i class="fa-solid fa-user-check"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Technician Behaviour</span>
+
+                    <h2 id="feedbackBehaviour">
+                        -
+                    </h2>
+
+                    <p>
+                        <b id="feedbackBehaviourCount">0</b>
+                        responses
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Resolution -->
+
+            <div class="feedback-summary-card">
+
+                <div class="feedback-icon resolution-icon">
+
+                    <i class="fa-solid fa-clock"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Resolution Time</span>
+
+                    <h2 id="feedbackResolution">
+                        -
+                    </h2>
+
+                    <p>
+                        <b id="feedbackResolutionCount">0</b>
+                        responses
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <!-- Total -->
+
+            <div class="feedback-summary-card">
+
+                <div class="feedback-icon total-icon">
+
+                    <i class="fa-solid fa-comments"></i>
+
+                </div>
+
+                <div>
+
+                    <span>Total Feedback</span>
+
+                    <h2 id="totalFeedbackCount">
+                        0
+                    </h2>
+
+                    <p>
+                        All feedback records
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- TECHNICIAN PERFORMANCE -->
+
+        <div class="feedback-section">
+
+            <div class="feedback-section-title">
+
+                <h2>
+                    <i class="fa-solid fa-chart-line"></i>
+                    Technician Performance
+                </h2>
+
+            </div>
+
+
+            <div class="feedback-table-wrapper">
+
+                <table class="feedback-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+
+                            <th>Technician Name</th>
+
+                            <th>Feedbacks</th>
+
+                            <th>Overall Rating</th>
+
+                            <th>Technician Behaviour</th>
+
+                            <th>Resolution Time</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="technicianFeedbackBody">
+
+                        <tr>
+
+                            <td colspan="6">
+                                Loading...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+
+        <!-- FILTERS -->
+
+        <div class="feedback-filter-section">
+
+
+            <div class="feedback-search">
+
+                <i class="fa-solid fa-magnifying-glass"></i>
+
+                <input
+                    type="text"
+                    id="feedbackSearch"
+                    placeholder="Search feedback..."
+                >
+
+            </div>
+
+
+            <select id="feedbackBuildingFilter">
+
+                <option value="">
+                    All Buildings
+                </option>
+
+            </select>
+
+
+            <select id="feedbackTechnicianFilter">
+
+                <option value="">
+                    All Technicians
+                </option>
+
+            </select>
+
+
+            <select id="feedbackRatingFilter">
+
+                <option value="">
+                    All Ratings
+                </option>
+
+                <option value="5">5</option>
+                <option value="4.5">4.5</option>
+                <option value="4">4</option>
+                <option value="3.5">3.5</option>
+                <option value="3">3</option>
+                <option value="2.5">2.5</option>
+                <option value="2">2</option>
+                <option value="1.5">1.5</option>
+                <option value="1">1</option>
+
+            </select>
+
+
+            <button
+                id="feedbackFilterBtn"
+                class="feedback-primary-btn">
+
+                <i class="fa-solid fa-filter"></i>
+                Apply Filter
+
+            </button>
+
+
+            <button
+                id="feedbackResetBtn"
+                class="feedback-secondary-btn">
+
+                <i class="fa-solid fa-rotate-right"></i>
+                Reset
+
+            </button>
+
+        </div>
+
+
+        <!-- FEEDBACK RECORDS -->
+
+        <div class="feedback-section">
+
+            <div class="feedback-section-title">
+
+                <h2>
+                    <i class="fa-solid fa-comments"></i>
+                    Feedback Records
+                </h2>
+
+            </div>
+
+
+            <div class="feedback-table-wrapper">
+
+                <table class="feedback-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>#</th>
+                            <th>Ticket No</th>
+                            <th>Faculty / Staff</th>
+                            <th>Building</th>
+                            <th>Technician</th>
+                            <th>Overall Rating</th>
+                            <th>Technician Behaviour</th>
+                            <th>Resolution Time</th>
+                            <th>Comments</th>
+                            <th>Feedback Date</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="feedbackRecordsBody">
+
+                        <tr>
+
+                            <td colspan="10">
+                                Loading...
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
