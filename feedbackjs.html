@@ -1,0 +1,1110 @@
+<script>
+
+/*************************************************
+ * FEEDBACK MODULE
+ *************************************************/
+
+let feedbackData = [];
+
+let feedbackFilters = {
+    search: "",
+    building: "",
+    technician: "",
+    rating: ""
+};
+
+
+/*************************************************
+ * LOAD FEEDBACK
+ *************************************************/
+
+function loadFeedback() {
+
+    google.script.run
+
+        .withSuccessHandler(function(data) {
+
+            console.log("Feedback Data:", data);
+
+            if (!data) {
+
+                console.error("No feedback data received.");
+
+                return;
+
+            }
+
+            feedbackData =
+                data.records || [];
+
+
+            updateFeedbackSummary(
+                data.summary || {}
+            );
+
+
+            renderTechnicianPerformance(
+                data.technicians || []
+            );
+
+
+            renderFeedbackTable(
+                feedbackData
+            );
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            console.error(
+                "Feedback loading error:",
+                error
+            );
+
+            Swal.fire({
+
+                icon: "error",
+
+                title: "Unable to Load Feedback",
+
+                text:
+                    error.message ||
+                    "Something went wrong."
+
+            });
+
+        })
+
+        .getFeedbackData(
+
+            getSessionToken(),
+
+            feedbackFilters
+
+        );
+
+}
+
+
+/*************************************************
+ * LOAD FILTER OPTIONS
+ *************************************************/
+
+function loadFeedbackFilters() {
+
+    google.script.run
+
+        .withSuccessHandler(function(data) {
+
+            if (!data) return;
+
+
+            const building =
+                document.getElementById(
+                    "feedbackBuildingFilter"
+                );
+
+
+            const technician =
+                document.getElementById(
+                    "feedbackTechnicianFilter"
+                );
+
+
+            if (!building || !technician) {
+
+                return;
+
+            }
+
+
+            /*
+             * BUILDINGS
+             */
+
+            building.innerHTML =
+                '<option value="">All Buildings</option>';
+
+
+            (data.buildings || [])
+                .forEach(function(item) {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value = item;
+
+                    option.textContent = item;
+
+                    building.appendChild(option);
+
+                });
+
+
+            /*
+             * TECHNICIANS
+             */
+
+            technician.innerHTML =
+                '<option value="">All Technicians</option>';
+
+
+            (data.technicians || [])
+                .forEach(function(item) {
+
+                    const option =
+                        document.createElement(
+                            "option"
+                        );
+
+                    option.value = item;
+
+                    option.textContent = item;
+
+                    technician.appendChild(option);
+
+                });
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            console.error(
+                "Feedback filter error:",
+                error
+            );
+
+        })
+
+        .getFeedbackFilters(
+            getSessionToken()
+        );
+
+}
+
+
+/*************************************************
+ * UPDATE SUMMARY CARDS
+ *************************************************/
+
+function updateFeedbackSummary(summary) {
+
+
+    /*
+     * OVERALL RATING
+     */
+
+    const overallRating =
+        document.getElementById(
+            "feedbackOverallRating"
+        );
+
+
+    if (overallRating) {
+
+        overallRating.innerText =
+            Number(
+                summary.averageRating || 0
+            ).toFixed(2);
+
+    }
+
+
+    /*
+     * RATING COUNT
+     */
+
+    const ratingCount =
+        document.getElementById(
+            "feedbackRatingCount"
+        );
+
+
+    if (ratingCount) {
+
+        ratingCount.innerText =
+            summary.totalFeedback || 0;
+
+    }
+
+
+    /*
+     * TECHNICIAN BEHAVIOUR
+     */
+
+    const behaviour =
+        document.getElementById(
+            "feedbackBehaviour"
+        );
+
+
+    if (behaviour) {
+
+        behaviour.innerText =
+            summary.behaviour || "-";
+
+    }
+
+
+    /*
+     * BEHAVIOUR COUNT
+     */
+
+    const behaviourCount =
+        document.getElementById(
+            "feedbackBehaviourCount"
+        );
+
+
+    if (behaviourCount) {
+
+        behaviourCount.innerText =
+            summary.behaviourCount || 0;
+
+    }
+
+
+    /*
+     * RESOLUTION TIME
+     */
+
+    const resolution =
+        document.getElementById(
+            "feedbackResolution"
+        );
+
+
+    if (resolution) {
+
+        resolution.innerText =
+            summary.resolution || "-";
+
+    }
+
+
+    /*
+     * RESOLUTION COUNT
+     */
+
+    const resolutionCount =
+        document.getElementById(
+            "feedbackResolutionCount"
+        );
+
+
+    if (resolutionCount) {
+
+        resolutionCount.innerText =
+            summary.resolutionCount || 0;
+
+    }
+
+
+    /*
+     * TOTAL FEEDBACK
+     */
+
+    const totalFeedback =
+        document.getElementById(
+            "totalFeedbackCount"
+        );
+
+
+    if (totalFeedback) {
+
+        totalFeedback.innerText =
+            summary.totalFeedback || 0;
+
+    }
+
+}
+
+
+/*************************************************
+ * RENDER TECHNICIAN PERFORMANCE
+ *************************************************/
+
+function renderTechnicianPerformance(
+    technicians
+) {
+
+    const tbody =
+        document.getElementById(
+            "technicianFeedbackBody"
+        );
+
+
+    if (!tbody) return;
+
+
+    if (
+        !technicians ||
+        technicians.length === 0
+    ) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="6"
+                    class="feedback-empty">
+
+                    <i class="fa-solid fa-circle-info"></i>
+
+                    <br><br>
+
+                    No technician feedback available.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    technicians.forEach(
+        function(tech, index) {
+
+
+            html += `
+
+                <tr>
+
+                    <!-- # -->
+
+                    <td>
+                        ${index + 1}
+                    </td>
+
+
+                    <!-- TECHNICIAN -->
+
+                    <td>
+
+                        ${escapeHtml(
+                            tech.name
+                        )}
+
+                    </td>
+
+
+                    <!-- FEEDBACK COUNT -->
+
+                    <td>
+
+                        ${tech.feedbacks}
+
+                    </td>
+
+
+                    <!-- AVERAGE RATING -->
+
+                    <td>
+
+                        ${createRatingHTML(
+                            tech.averageRating
+                        )}
+
+                    </td>
+
+
+                    <!-- BEHAVIOUR -->
+
+                    <td>
+
+                        ${createBehaviourHTML(
+                            tech.behaviour
+                        )}
+
+                    </td>
+
+
+                    <!-- RESOLUTION -->
+
+                    <td>
+
+                        ${createResolutionHTML(
+                            tech.resolution
+                        )}
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    tbody.innerHTML = html;
+
+}
+
+
+/*************************************************
+ * RENDER FEEDBACK RECORDS
+ *************************************************/
+
+function renderFeedbackTable(
+    records
+) {
+
+    const tbody =
+        document.getElementById(
+            "feedbackRecordsBody"
+        );
+
+
+    if (!tbody) return;
+
+
+    if (
+        !records ||
+        records.length === 0
+    ) {
+
+        tbody.innerHTML = `
+
+            <tr>
+
+                <td
+                    colspan="10"
+                    class="feedback-empty">
+
+                    <i class="fa-solid fa-comments"></i>
+
+                    <br><br>
+
+                    No feedback found.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+    let html = "";
+
+
+    records.forEach(
+        function(record, index) {
+
+
+            html += `
+
+                <tr>
+
+                    <!-- # -->
+
+                    <td>
+
+                        ${index + 1}
+
+                    </td>
+
+
+                    <!-- TICKET -->
+
+                    <td>
+
+                        ${escapeHtml(
+                            record.ticketNo
+                        )}
+
+                    </td>
+
+
+                    <!-- FACULTY -->
+
+                    <td>
+
+                        ${escapeHtml(
+                            record.faculty
+                        )}
+
+                    </td>
+
+
+                    <!-- BUILDING -->
+
+                    <td>
+
+                        ${escapeHtml(
+                            record.building
+                        )}
+
+                    </td>
+
+
+                    <!-- TECHNICIAN -->
+
+                    <td>
+
+                        ${escapeHtml(
+                            record.technician
+                        )}
+
+                    </td>
+
+
+                    <!-- RATING -->
+
+                    <td>
+
+                        ${createRatingHTML(
+                            record.rating
+                        )}
+
+                    </td>
+
+
+                    <!-- BEHAVIOUR -->
+
+                    <td>
+
+                        ${createBehaviourHTML(
+                            record.behaviour
+                        )}
+
+                    </td>
+
+
+                    <!-- RESOLUTION -->
+
+                    <td>
+
+                        ${createResolutionHTML(
+                            record.resolution
+                        )}
+
+                    </td>
+
+
+                    <!-- COMMENTS -->
+
+                    <td
+                        title="${escapeHtml(
+                            record.comments
+                        )}">
+
+                        ${
+                            truncateText(
+                                record.comments,
+                                35
+                            )
+                        }
+
+                    </td>
+
+
+                    <!-- DATE -->
+
+                    <td>
+
+                        ${escapeHtml(
+                            record.feedbackDate
+                        )}
+
+                    </td>
+
+                </tr>
+
+            `;
+
+        }
+    );
+
+
+    tbody.innerHTML = html;
+
+}
+
+
+/*************************************************
+ * RATING HTML
+ *************************************************/
+
+function createRatingHTML(
+    rating
+) {
+
+    const value =
+        Number(rating) || 0;
+
+
+    let ratingClass =
+        "rating-medium";
+
+
+    if (value >= 4) {
+
+        ratingClass =
+            "rating-high";
+
+    }
+    else if (value < 3) {
+
+        ratingClass =
+            "rating-low";
+
+    }
+
+
+    return `
+
+        <span
+            class="feedback-rating ${ratingClass}">
+
+            <i class="fa-solid fa-star"></i>
+
+            ${value.toFixed(1)}
+
+        </span>
+
+    `;
+
+}
+
+
+/*************************************************
+ * TECHNICIAN BEHAVIOUR HTML
+ *************************************************/
+
+function createBehaviourHTML(
+    value
+) {
+
+    if (
+        !value ||
+        value === "-"
+    ) {
+
+        return "-";
+
+    }
+
+
+    return `
+
+        <span
+            class="feedback-text-badge behaviour-badge">
+
+            ${escapeHtml(value)}
+
+        </span>
+
+    `;
+
+}
+
+
+/*************************************************
+ * RESOLUTION HTML
+ *************************************************/
+
+function createResolutionHTML(
+    value
+) {
+
+    if (
+        !value ||
+        value === "-"
+    ) {
+
+        return "-";
+
+    }
+
+
+    return `
+
+        <span
+            class="feedback-text-badge resolution-badge">
+
+            ${escapeHtml(value)}
+
+        </span>
+
+    `;
+
+}
+
+
+/*************************************************
+ * SEARCH + FILTER
+ *************************************************/
+
+function applyFeedbackFilter() {
+
+
+    feedbackFilters.search =
+        document.getElementById(
+            "feedbackSearch"
+        )?.value
+        .trim() || "";
+
+
+    feedbackFilters.building =
+        document.getElementById(
+            "feedbackBuildingFilter"
+        )?.value || "";
+
+
+    feedbackFilters.technician =
+        document.getElementById(
+            "feedbackTechnicianFilter"
+        )?.value || "";
+
+
+    feedbackFilters.rating =
+        document.getElementById(
+            "feedbackRatingFilter"
+        )?.value || "";
+
+
+    loadFeedback();
+
+}
+
+
+/*************************************************
+ * RESET FILTERS
+ *************************************************/
+
+function resetFeedbackFilters() {
+
+
+    feedbackFilters = {
+
+        search: "",
+
+        building: "",
+
+        technician: "",
+
+        rating: ""
+
+    };
+
+
+    const search =
+        document.getElementById(
+            "feedbackSearch"
+        );
+
+
+    const building =
+        document.getElementById(
+            "feedbackBuildingFilter"
+        );
+
+
+    const technician =
+        document.getElementById(
+            "feedbackTechnicianFilter"
+        );
+
+
+    const rating =
+        document.getElementById(
+            "feedbackRatingFilter"
+        );
+
+
+    if (search) {
+
+        search.value = "";
+
+    }
+
+
+    if (building) {
+
+        building.value = "";
+
+    }
+
+
+    if (technician) {
+
+        technician.value = "";
+
+    }
+
+
+    if (rating) {
+
+        rating.value = "";
+
+    }
+
+
+    loadFeedback();
+
+}
+
+
+/*************************************************
+ * FILTER BY TECHNICIAN
+ *************************************************/
+
+function filterTechnicianFeedback(
+    technicianName
+) {
+
+    const select =
+        document.getElementById(
+            "feedbackTechnicianFilter"
+        );
+
+
+    if (!select) return;
+
+
+    select.value =
+        technicianName;
+
+
+    feedbackFilters.technician =
+        technicianName;
+
+
+    loadFeedback();
+
+}
+
+
+/*************************************************
+ * REFRESH
+ *************************************************/
+
+function refreshFeedback() {
+
+    loadFeedbackFilters();
+
+    loadFeedback();
+
+}
+
+
+/*************************************************
+ * TEXT TRUNCATION
+ *************************************************/
+
+function truncateText(
+    value,
+    maxLength
+) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    const text =
+        String(value);
+
+
+    if (
+        text.length <= maxLength
+    ) {
+
+        return escapeHtml(text);
+
+    }
+
+
+    return escapeHtml(
+        text.substring(0, maxLength)
+    ) + "...";
+
+}
+
+
+/*************************************************
+ * HTML ESCAPE
+ *************************************************/
+
+function escapeHtml(value) {
+
+    if (
+        value === null ||
+        value === undefined
+    ) {
+
+        return "";
+
+    }
+
+
+    return String(value)
+
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+
+        .replace(
+            /</g,
+            "&lt;"
+        )
+
+        .replace(
+            />/g,
+            "&gt;"
+        )
+
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/*************************************************
+ * INITIALIZE FEEDBACK
+ *************************************************/
+
+function initializeFeedbackPage() {
+
+    loadFeedbackFilters();
+
+    loadFeedback();
+
+}
+
+
+/*************************************************
+ * EVENTS
+ *************************************************/
+
+
+/*
+ * SEARCH
+ */
+
+document.addEventListener(
+    "input",
+    function(event) {
+
+        if (
+            event.target &&
+            event.target.id ===
+            "feedbackSearch"
+        ) {
+
+            applyFeedbackFilter();
+
+        }
+
+    }
+);
+
+
+/*
+ * FILTER DROPDOWNS
+ */
+
+document.addEventListener(
+    "change",
+    function(event) {
+
+        if (!event.target) return;
+
+
+        if (
+
+            event.target.id ===
+            "feedbackBuildingFilter"
+
+            ||
+
+            event.target.id ===
+            "feedbackTechnicianFilter"
+
+            ||
+
+            event.target.id ===
+            "feedbackRatingFilter"
+
+        ) {
+
+            applyFeedbackFilter();
+
+        }
+
+    }
+);
+
+
+/*
+ * APPLY BUTTON
+ */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.closest(
+                "#feedbackFilterBtn"
+            )
+        ) {
+
+            applyFeedbackFilter();
+
+        }
+
+    }
+);
+
+
+/*
+ * RESET BUTTON
+ */
+
+document.addEventListener(
+    "click",
+    function(event) {
+
+        if (
+            event.target.closest(
+                "#feedbackResetBtn"
+            )
+        ) {
+
+            resetFeedbackFilters();
+
+        }
+
+    }
+);
+
+</script>
