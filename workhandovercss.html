@@ -1,0 +1,502 @@
+<style>
+
+/* =========================================================
+   WORK HANDOVER
+========================================================= */
+
+.workhandover-page{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    gap:25px;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.workhandover-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.workhandover-header h1{
+    color:#2E2278;
+    font-size:28px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.workhandover-header h1 i{
+    color:#E1A855;
+}
+
+.workhandover-header p{
+    color:#777;
+    margin-top:5px;
+    font-size:14px;
+}
+
+
+/* =========================================================
+   MAIN GRID
+========================================================= */
+
+.workhandover-grid{
+    display:grid;
+    grid-template-columns:1fr 1.45fr;
+    gap:25px;
+    align-items:start;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.workhandover-card{
+    background:#fff;
+    border-radius:20px;
+    padding:25px;
+    box-shadow:0 10px 30px rgba(0,0,0,.06);
+}
+
+
+/* =========================================================
+   CARD HEADER
+========================================================= */
+
+.workhandover-card-header{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:25px;
+    padding-bottom:18px;
+    border-bottom:1px solid #edf0f6;
+}
+
+.workhandover-card-icon{
+    width:48px;
+    height:48px;
+    border-radius:12px;
+    background:#f1effc;
+    color:#2E2278;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:20px;
+}
+
+.workhandover-card-header h2{
+    color:#2E2278;
+    font-size:20px;
+    font-weight:700;
+}
+
+.workhandover-card-header p{
+    color:#888;
+    font-size:13px;
+    margin-top:3px;
+}
+
+
+/* =========================================================
+   FORM
+========================================================= */
+
+.workhandover-form{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.workhandover-form-group{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+}
+
+.workhandover-form-group label{
+    font-size:13px;
+    font-weight:600;
+    color:#444;
+}
+
+.workhandover-form-group label span{
+    color:#e74c3c;
+}
+
+
+/* =========================================================
+   INPUT / SELECT
+========================================================= */
+
+.workhandover-input,
+.workhandover-select,
+.workhandover-textarea{
+    width:100%;
+    border:1px solid #dfe3ec;
+    border-radius:10px;
+    background:#fff;
+    color:#333;
+    font-family:'Poppins',sans-serif;
+    font-size:14px;
+    outline:none;
+    transition:.25s;
+}
+
+.workhandover-input,
+.workhandover-select{
+    height:44px;
+    padding:0 13px;
+}
+
+.workhandover-textarea{
+    min-height:90px;
+    padding:12px 13px;
+    resize:vertical;
+}
+
+.workhandover-input:focus,
+.workhandover-select:focus,
+.workhandover-textarea:focus{
+    border-color:#2E2278;
+    box-shadow:0 0 0 3px rgba(46,34,120,.08);
+}
+
+
+/* =========================================================
+   READONLY FIELD
+========================================================= */
+
+.workhandover-readonly{
+    position:relative;
+}
+
+.workhandover-readonly .workhandover-input{
+    background:#f5f6fa;
+    color:#555;
+    padding-right:40px;
+}
+
+.workhandover-readonly i{
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#999;
+    font-size:13px;
+}
+
+
+/* =========================================================
+   TWO COLUMN FORM
+========================================================= */
+
+.workhandover-two-column{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
+
+
+/* =========================================================
+   INFORMATION BOX
+========================================================= */
+
+.workhandover-info{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    padding:12px 14px;
+    border-radius:10px;
+    background:#f4f2ff;
+    color:#555;
+    font-size:12px;
+    line-height:1.6;
+}
+
+.workhandover-info i{
+    color:#2E2278;
+    margin-top:3px;
+}
+
+
+/* =========================================================
+   STATUS
+========================================================= */
+
+.workhandover-status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    height:44px;
+    padding:0 14px;
+    border-radius:10px;
+    background:#eafaf1;
+    color:#1e9b58;
+    font-size:14px;
+    font-weight:600;
+    border:1px solid #c9f0d9;
+}
+
+.workhandover-status-dot{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#2ecc71;
+}
+
+
+/* =========================================================
+   BUTTON AREA
+========================================================= */
+
+.workhandover-buttons{
+    display:flex;
+    justify-content:flex-end;
+    gap:10px;
+    margin-top:5px;
+}
+
+
+/* =========================================================
+   PRIMARY BUTTON
+========================================================= */
+
+.workhandover-primary-btn{
+    border:none;
+    background:#2E2278;
+    color:#fff;
+    padding:12px 20px;
+    border-radius:10px;
+    font-family:'Poppins',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.workhandover-primary-btn:hover{
+    background:#20185f;
+    transform:translateY(-2px);
+}
+
+.workhandover-primary-btn:disabled{
+    opacity:.65;
+    cursor:not-allowed;
+    transform:none;
+}
+
+
+/* =========================================================
+   SECONDARY BUTTON
+========================================================= */
+
+.workhandover-secondary-btn{
+    border:none;
+    background:#eef1f7;
+    color:#555;
+    padding:12px 20px;
+    border-radius:10px;
+    font-family:'Poppins',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.workhandover-secondary-btn:hover{
+    background:#e1e5ee;
+}
+
+
+/* =========================================================
+   TABLE CARD
+========================================================= */
+
+.workhandover-table-wrapper{
+    width:100%;
+    overflow-x:auto;
+}
+
+.workhandover-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+}
+
+.workhandover-table thead{
+    background:#2E2278;
+    color:#fff;
+}
+
+.workhandover-table th{
+    padding:13px 12px;
+    text-align:left;
+    font-weight:600;
+    white-space:nowrap;
+}
+
+.workhandover-table td{
+    padding:13px 12px;
+    border-bottom:1px solid #edf0f5;
+    color:#444;
+    white-space:nowrap;
+}
+
+.workhandover-table tbody tr{
+    transition:.2s;
+}
+
+.workhandover-table tbody tr:hover{
+    background:#f8f9fd;
+}
+
+
+/* =========================================================
+   TECHNICIAN BADGE
+========================================================= */
+
+.workhandover-tech{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.workhandover-tech-avatar{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    background:#E1A855;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:13px;
+    font-weight:700;
+}
+
+
+/* =========================================================
+   ACTIVE STATUS BADGE
+========================================================= */
+
+.workhandover-active{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 10px;
+    border-radius:20px;
+    background:#eafaf1;
+    color:#1e9b58;
+    font-size:11px;
+    font-weight:600;
+}
+
+.workhandover-active i{
+    font-size:7px;
+}
+
+
+/* =========================================================
+   EXPIRED STATUS
+========================================================= */
+
+.workhandover-expired{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    padding:5px 10px;
+    border-radius:20px;
+    background:#f5f5f5;
+    color:#777;
+    font-size:11px;
+    font-weight:600;
+}
+
+
+/* =========================================================
+   TABLE EMPTY STATE
+========================================================= */
+
+.workhandover-empty{
+    text-align:center;
+    padding:45px 20px !important;
+    color:#888 !important;
+}
+
+.workhandover-empty i{
+    display:block;
+    font-size:40px;
+    color:#c5cad8;
+    margin-bottom:12px;
+}
+
+.workhandover-empty strong{
+    display:block;
+    color:#666;
+    margin-bottom:4px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.workhandover-loading{
+    text-align:center;
+    padding:40px;
+    color:#777;
+}
+
+.workhandover-loading i{
+    color:#2E2278;
+    font-size:25px;
+    margin-bottom:10px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1200px){
+
+    .workhandover-grid{
+        grid-template-columns:1fr;
+    }
+
+}
+
+
+@media(max-width:700px){
+
+    .workhandover-two-column{
+        grid-template-columns:1fr;
+    }
+
+    .workhandover-card{
+        padding:18px;
+    }
+
+    .workhandover-header h1{
+        font-size:23px;
+    }
+
+    .workhandover-buttons{
+        flex-direction:column;
+    }
+
+    .workhandover-primary-btn,
+    .workhandover-secondary-btn{
+        width:100%;
+    }
+
+}
+
+</style>
