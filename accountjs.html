@@ -1,0 +1,1022 @@
+<script>
+
+/* =========================================================
+   ACCOUNT MODULE
+========================================================= */
+
+let accountUserData = null;
+
+
+/* =========================================================
+   GET SESSION TOKEN
+========================================================= */
+
+function getAccountSessionToken() {
+
+    const url = new URL(window.location.href);
+
+    let token = url.searchParams.get("token");
+
+    if (!token) {
+        token = sessionStorage.getItem("sessionToken");
+    }
+
+    return token;
+}
+
+
+/* =========================================================
+   INITIALIZE ACCOUNT PAGE
+========================================================= */
+
+function initializeAccountPage() {
+
+    loadAccountProfile();
+
+}
+
+
+/* =========================================================
+   LOAD ACCOUNT PROFILE
+========================================================= */
+
+function loadAccountProfile() {
+
+    const token = getAccountSessionToken();
+
+    if (!token) {
+
+        console.error("Account: Session token not found.");
+
+        return;
+
+    }
+
+
+    google.script.run
+
+        .withSuccessHandler(function(user) {
+
+            if (!user) {
+
+                Swal.fire({
+
+                    icon: "error",
+
+                    title: "Session Expired",
+
+                    text: "Please login again."
+
+                });
+
+                return;
+
+            }
+
+
+            accountUserData = user;
+
+            populateAccountForm(user);
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            console.error("Account profile error:", error);
+
+            Swal.fire({
+
+                icon: "error",
+
+                title: "Unable to Load Account",
+
+                text: error.message || "Something went wrong."
+
+            });
+
+        })
+
+        .getAccountDetails(token);
+
+}
+
+
+/* =========================================================
+   POPULATE ACCOUNT FORM
+========================================================= */
+
+function populateAccountForm(user) {
+
+    /* -----------------------------------------
+       Profile Header
+    ----------------------------------------- */
+
+    document.getElementById("accountProfileName").innerText =
+        user.name || "-";
+
+
+    document.getElementById("accountProfileRole").innerText =
+        user.role || "-";
+
+
+    document.getElementById("accountProfileStatus").innerText =
+        user.status || "-";
+
+
+    document.getElementById("accountAvatar").innerText =
+        user.name
+        ? user.name.charAt(0).toUpperCase()
+        : "A";
+
+
+    /* -----------------------------------------
+       Header Details
+    ----------------------------------------- */
+
+    document.getElementById("accountHeaderUserId").innerText =
+        user.userId || "-";
+
+
+    document.getElementById("accountHeaderEmail").innerText =
+        user.email || "-";
+
+
+    document.getElementById("accountHeaderMobile").innerText =
+        user.mobile || "-";
+
+
+    /* -----------------------------------------
+       Editable Fields
+    ----------------------------------------- */
+
+    document.getElementById("accountUserId").value =
+        user.userId || "";
+
+
+    document.getElementById("accountName").value =
+        user.name || "";
+
+
+    document.getElementById("accountEmail").value =
+        user.email || "";
+
+
+    document.getElementById("accountMobile").value =
+        user.mobile || "";
+
+
+    /* -----------------------------------------
+       Read Only Fields
+    ----------------------------------------- */
+
+    document.getElementById("accountRole").value =
+        user.role || "";
+
+
+    document.getElementById("accountStatus").value =
+        user.status || "";
+
+}
+
+
+/* =========================================================
+   SAVE PROFILE
+========================================================= */
+
+document
+.getElementById("btnSaveProfile")
+.addEventListener("click", function() {
+
+    saveAccountProfile();
+
+});
+
+
+function saveAccountProfile() {
+
+    if (!accountUserData) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Please Wait",
+
+            text: "Account information is still loading."
+
+        });
+
+        return;
+
+    }
+
+
+    const userId =
+        document.getElementById("accountUserId").value.trim();
+
+
+    const name =
+        document.getElementById("accountName").value.trim();
+
+
+    const email =
+        document.getElementById("accountEmail").value.trim();
+
+
+    const mobile =
+        document.getElementById("accountMobile").value.trim();
+
+
+    /* -----------------------------------------
+       Basic Validation
+    ----------------------------------------- */
+
+    if (!userId) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "User ID Required",
+
+            text: "Please enter your User ID."
+
+        });
+
+        return;
+
+    }
+
+
+    if (!name) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Name Required",
+
+            text: "Please enter your name."
+
+        });
+
+        return;
+
+    }
+
+
+    if (!email) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Email Required",
+
+            text: "Please enter your email address."
+
+        });
+
+        return;
+
+    }
+
+
+    if (!mobile) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Mobile Required",
+
+            text: "Please enter your mobile number."
+
+        });
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------
+       Email Format
+    ----------------------------------------- */
+
+    const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+
+    if (!emailPattern.test(email)) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Invalid Email",
+
+            text: "Please enter a valid email address."
+
+        });
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------
+       Disable Button
+    ----------------------------------------- */
+
+    const btn =
+        document.getElementById("btnSaveProfile");
+
+
+    btn.disabled = true;
+
+    btn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Checking...';
+
+
+    /* -----------------------------------------
+       Prepare Data
+    ----------------------------------------- */
+
+    const updatedUser = {
+
+        userId: userId,
+
+        name: name,
+
+        email: email,
+
+        mobile: mobile
+
+    };
+
+
+    google.script.run
+
+        .withSuccessHandler(function(result) {
+
+            btn.disabled = false;
+
+            btn.innerHTML =
+                '<i class="fa-solid fa-floppy-disk"></i> Save Profile';
+
+
+            if (!result || !result.success) {
+
+                Swal.fire({
+
+                    icon: "error",
+
+                    title: "Unable to Update",
+
+                    text:
+                        result && result.message
+                        ? result.message
+                        : "Profile update failed."
+
+                });
+
+                return;
+
+            }
+
+
+            /* -----------------------------------------
+               Update Local Data
+            ----------------------------------------- */
+
+accountUserData.userId =
+    result.userId;
+
+accountUserData.name =
+    result.name;
+
+accountUserData.email =
+    result.email;
+
+accountUserData.mobile =
+    result.mobile;
+
+
+populateAccountForm(result);
+
+
+            Swal.fire({
+
+                icon: "success",
+
+                title: "Profile Updated",
+
+                text: "Your account information has been updated successfully.",
+
+                confirmButtonColor: "#2E2278",
+
+                heightAuto: false,
+
+                scrollbarPadding: false
+
+            });
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            btn.disabled = false;
+
+            btn.innerHTML =
+                '<i class="fa-solid fa-floppy-disk"></i> Save Profile';
+
+
+            console.error(error);
+
+
+            Swal.fire({
+
+                icon: "error",
+
+                title: "Update Failed",
+
+                text:
+                    error.message ||
+                    "Unable to update your account."
+
+            });
+
+        })
+
+        .updateAccountProfile(
+            getAccountSessionToken(),
+            updatedUser
+        );
+
+}
+
+
+/* =========================================================
+   USER ID DUPLICATE CHECK
+========================================================= */
+
+document
+.getElementById("accountUserId")
+.addEventListener("blur", function() {
+
+    checkAccountUserId();
+
+});
+
+
+function checkAccountUserId() {
+
+    if (!accountUserData) return;
+
+
+    const userId =
+        document.getElementById("accountUserId").value.trim();
+
+
+    const message =
+        document.getElementById("accountUserIdMessage");
+
+
+    if (!userId) {
+
+        message.innerText = "";
+
+        return;
+
+    }
+
+
+    /* Same as current User ID */
+
+    if (
+        userId.toLowerCase() ===
+        String(accountUserData.userId).toLowerCase()
+    ) {
+
+        message.innerText =
+            "✓ Current User ID";
+
+        message.className = "success";
+
+        return;
+
+    }
+
+
+    message.innerText =
+        "Checking...";
+
+    message.className = "";
+
+
+    google.script.run
+
+.withSuccessHandler(function(result) {
+
+    if (result.available) {
+
+        message.innerText =
+            "✓ User ID is available";
+
+        message.className =
+            "success";
+
+    } else {
+
+        message.innerText =
+            "✕ " + result.message;
+
+        message.className =
+            "error";
+
+    }
+
+})
+
+        .withFailureHandler(function(error) {
+
+            console.error(error);
+
+            message.innerText =
+                "Unable to check User ID";
+
+            message.className =
+                "error";
+
+        })
+
+        .checkAccountUserId(
+            getAccountSessionToken(),
+            userId
+        );
+
+}
+
+
+/* =========================================================
+   EMAIL DUPLICATE CHECK
+========================================================= */
+
+document
+.getElementById("accountEmail")
+.addEventListener("blur", function() {
+
+    checkAccountEmail();
+
+});
+
+
+function checkAccountEmail() {
+
+    if (!accountUserData) return;
+
+
+    const email =
+        document.getElementById("accountEmail").value.trim();
+
+
+    const message =
+        document.getElementById("accountEmailMessage");
+
+
+    if (!email) {
+
+        message.innerText = "";
+
+        return;
+
+    }
+
+
+    /* Same as current Email */
+
+    if (
+        email.toLowerCase() ===
+        String(accountUserData.email).toLowerCase()
+    ) {
+
+        message.innerText =
+            "✓ Current Email";
+
+        message.className =
+            "success";
+
+        return;
+
+    }
+
+
+    message.innerText =
+        "Checking...";
+
+    message.className = "";
+
+
+    google.script.run
+
+.withSuccessHandler(function(result) {
+
+    if (result.available) {
+
+        message.innerText =
+            "✓ Email is available";
+
+        message.className =
+            "success";
+
+    } else {
+
+        message.innerText =
+            "✕ " + result.message;
+
+        message.className =
+            "error";
+
+    }
+
+})
+
+        .withFailureHandler(function(error) {
+
+            console.error(error);
+
+            message.innerText =
+                "Unable to check email";
+
+            message.className =
+                "error";
+
+        })
+
+        .checkAccountEmail(
+            getAccountSessionToken(),
+            email
+        );
+
+}
+
+
+/* =========================================================
+   CHANGE PASSWORD BUTTON
+========================================================= */
+
+document
+.getElementById("btnChangePassword")
+.addEventListener("click", function() {
+
+    openChangePasswordModal();
+
+});
+
+
+function openChangePasswordModal() {
+
+    document.getElementById("currentPassword").value = "";
+
+    document.getElementById("newPassword").value = "";
+
+    document.getElementById("confirmPassword").value = "";
+
+
+    document.getElementById("changePasswordModal").style.display =
+        "block";
+
+}
+
+
+/* =========================================================
+   CLOSE PASSWORD MODAL
+========================================================= */
+
+document
+.getElementById("closePasswordModal")
+.addEventListener("click", function() {
+
+    closeChangePasswordModal();
+
+});
+
+
+document
+.getElementById("btnCancelPassword")
+.addEventListener("click", function() {
+
+    closeChangePasswordModal();
+
+});
+
+
+document
+.querySelector(".account-modal-overlay")
+.addEventListener("click", function() {
+
+    closeChangePasswordModal();
+
+});
+
+
+function closeChangePasswordModal() {
+
+    document.getElementById("changePasswordModal").style.display =
+        "none";
+
+}
+
+
+/* =========================================================
+   PASSWORD VISIBILITY
+========================================================= */
+
+document
+.querySelectorAll(".password-toggle")
+.forEach(function(button) {
+
+    button.addEventListener("click", function() {
+
+        const targetId =
+            this.dataset.target;
+
+        toggleAccountPassword(
+            targetId,
+            this
+        );
+
+    });
+
+});
+
+
+function toggleAccountPassword(inputId, button) {
+
+    const input =
+        document.getElementById(inputId);
+
+
+    if (input.type === "password") {
+
+        input.type = "text";
+
+        button.innerHTML =
+            '<i class="fa-solid fa-eye-slash"></i>';
+
+    } else {
+
+        input.type = "password";
+
+        button.innerHTML =
+            '<i class="fa-solid fa-eye"></i>';
+
+    }
+
+}
+
+
+/* =========================================================
+   PASSWORD SAVE
+========================================================= */
+
+document
+.getElementById("btnSavePassword")
+.addEventListener("click", function() {
+
+    changeAccountPassword();
+
+});
+
+
+function changeAccountPassword() {
+
+    const currentPassword =
+        document.getElementById("currentPassword").value;
+
+
+    const newPassword =
+        document.getElementById("newPassword").value;
+
+
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
+
+
+    /* -----------------------------------------
+       Validation
+    ----------------------------------------- */
+
+    if (!currentPassword) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Current Password Required",
+
+            text: "Please enter your current password."
+
+        });
+
+        return;
+
+    }
+
+
+    if (!newPassword) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "New Password Required",
+
+            text: "Please enter a new password."
+
+        });
+
+        return;
+
+    }
+
+
+    if (!confirmPassword) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Confirm Password",
+
+            text: "Please confirm your new password."
+
+        });
+
+        return;
+
+    }
+
+
+    if (newPassword !== confirmPassword) {
+
+        Swal.fire({
+
+            icon: "error",
+
+            title: "Password Mismatch",
+
+            text: "New password and confirmation do not match."
+
+        });
+
+        return;
+
+    }
+
+
+    if (currentPassword === newPassword) {
+
+        Swal.fire({
+
+            icon: "warning",
+
+            title: "Choose a New Password",
+
+            text: "Your new password must be different from your current password."
+
+        });
+
+        return;
+
+    }
+
+
+    const btn =
+        document.getElementById("btnSavePassword");
+
+
+    btn.disabled = true;
+
+    btn.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Updating...';
+
+
+    google.script.run
+
+        .withSuccessHandler(function(result) {
+
+            btn.disabled = false;
+
+            btn.innerHTML =
+                '<i class="fa-solid fa-lock"></i> Change Password';
+
+
+            if (!result || !result.success) {
+
+                Swal.fire({
+
+                    icon: "error",
+
+                    title: "Password Not Changed",
+
+                    text:
+                        result && result.message
+                        ? result.message
+                        : "Unable to change password."
+
+                });
+
+                return;
+
+            }
+
+
+            closeChangePasswordModal();
+
+
+            Swal.fire({
+
+                icon: "success",
+
+                title: "Password Changed",
+
+                text: "Your password has been changed successfully.",
+
+                confirmButtonColor: "#2E2278",
+
+                heightAuto: false,
+
+                scrollbarPadding: false
+
+            });
+
+        })
+
+        .withFailureHandler(function(error) {
+
+            btn.disabled = false;
+
+            btn.innerHTML =
+                '<i class="fa-solid fa-lock"></i> Change Password';
+
+
+            console.error(error);
+
+
+            Swal.fire({
+
+                icon: "error",
+
+                title: "Password Change Failed",
+
+                text:
+                    error.message ||
+                    "Unable to change password."
+
+            });
+
+        })
+
+        .updateAccountPassword(
+            getAccountSessionToken(),
+            currentPassword,
+            newPassword
+        );
+
+}
+
+
+/* =========================================================
+   SHOW PASSWORD BUTTON
+========================================================= */
+
+document
+.getElementById("btnShowPassword")
+.addEventListener("click", function() {
+
+    /*
+       We intentionally do not show the actual password here.
+       The password remains protected.
+    */
+
+    Swal.fire({
+
+        icon: "info",
+
+        title: "Password Protected",
+
+        text: "For security reasons, your current password cannot be displayed.",
+
+        confirmButtonColor: "#2E2278",
+
+        heightAuto: false,
+
+        scrollbarPadding: false
+
+    });
+
+});
+
+
+</script>
