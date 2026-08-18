@@ -1,0 +1,1212 @@
+<script>
+ let allUsers = [];
+function renderUsers(users){
+
+
+   let html = "";
+
+
+   users.forEach(function(user){
+
+
+       html += `
+       <tr>
+
+
+           <td>${user.name}</td>
+
+
+           <td>${user.userId}</td>
+
+
+           <td>${user.email}</td>
+
+
+           <td>
+
+
+               <div class="password-box">
+
+
+                   <span id="pwd_${user.userId}">
+                       ********
+                   </span>
+
+
+                   <button class="action-btn view-btn"
+                   onclick="togglePassword('${user.userId}','${user.password}')">
+
+
+                       <i id="icon_${user.userId}"
+                       class="fa-solid fa-eye"></i>
+
+
+                   </button>
+
+
+               </div>
+
+
+           </td>
+
+
+           <td>${user.mobile}</td>
+
+
+           <td>${user.role}</td>
+
+
+           <td>${getStatusBadge(user.status)}</td>
+
+
+           <td>${getActionButtons(user)}</td>
+
+
+       </tr>
+       `;
+
+
+   });
+
+
+   if(users.length===0){
+
+
+       html=`
+       <tr>
+
+
+           <td colspan="8">
+
+
+               No Users Found
+
+
+           </td>
+
+
+       </tr>
+       `;
+
+
+   }
+
+
+   document.getElementById("usersTableBody").innerHTML=html;
+
+
+}
+function applyFilters(){
+
+
+   const search = document.getElementById("txtSearchUser")
+       .value
+       .trim()
+       .toLowerCase();
+
+
+   const role = document.getElementById("filterRole").value;
+
+
+   const status = document.getElementById("filterStatus").value;
+
+
+   const filteredUsers = allUsers.filter(function(user){
+
+
+       // Search
+const matchSearch =
+   String(user.name).toLowerCase().includes(search) ||
+   String(user.userId).toLowerCase().includes(search) ||
+   String(user.email).toLowerCase().includes(search);
+
+
+       // Role
+       const matchRole =
+           role === "" || user.role === role;
+
+
+       // Status
+       const matchStatus =
+           status === "" || user.status === status;
+
+
+       return matchSearch && matchRole && matchStatus;
+
+
+   });
+
+
+   renderUsers(filteredUsers);
+
+
+}
+
+
+function loadUsers(){
+
+
+   console.log("Loading users...");
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(users){
+
+
+       console.log(users);
+
+
+       allUsers = users;
+
+
+       renderUsers(allUsers);
+
+
+   })
+
+
+   .withFailureHandler(function(err){
+
+
+       console.error(err);
+
+
+   })
+
+
+   .getUsers();
+
+
+}
+function loadRoleFilter(){
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(roles){
+
+
+       const filter = document.getElementById("filterRole");
+
+
+       filter.innerHTML = `<option value="">All Roles</option>`;
+
+
+       roles.forEach(function(role){
+
+
+           filter.innerHTML += `
+
+
+               <option value="${role}">
+
+
+                   ${role}
+
+
+               </option>
+
+
+           `;
+
+
+       });
+
+
+   })
+
+
+   .getRoles();
+
+
+}
+function getStatusBadge(status){
+
+
+   status = String(status).trim().toUpperCase();
+
+
+   if(status === "YES"){
+
+
+       return `
+           <span class="status active">
+               <i class="fa-solid fa-circle"></i>
+               Active
+           </span>
+       `;
+
+
+   }
+
+
+   if(status === "PENDING"){
+
+
+       return `
+           <span class="status pending">
+               <i class="fa-solid fa-circle"></i>
+               Pending
+           </span>
+       `;
+
+
+   }
+
+
+   if(status === "REJECTED"){
+
+
+       return `
+           <span class="status rejected">
+               <i class="fa-solid fa-circle"></i>
+               Rejected
+           </span>
+       `;
+
+
+   }
+   if(status == "DISABLED"){
+
+
+   return `
+   <span class="status disabled">
+       ● Disabled
+   </span>
+   `;
+
+
+}
+
+
+   return status;
+
+
+}
+function getActionButtons(user){
+
+
+   let html = "";
+   const status = user.status.toString().trim().toUpperCase();
+
+
+   // View
+   html += `
+       <button class="action-btn view-btn"
+           onclick="viewUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-eye"></i>
+
+
+       </button>
+   `;
+
+
+   if(status === "YES"){
+
+
+   html += `
+       <button class="action-btn edit-btn"
+           onclick="editUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-pen"></i>
+
+
+       </button>
+
+
+       <button class="action-btn disable-btn"
+           onclick="disableUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-ban"></i>
+
+
+       </button>
+   `;
+
+
+}
+else if(status === "PENDING"){
+
+
+   html += `
+       <button class="action-btn edit-btn"
+           onclick="editUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-pen"></i>
+
+
+       </button>
+
+
+       <button class="action-btn approve-btn"
+           onclick="approveUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-check"></i>
+
+
+       </button>
+
+
+       <button class="action-btn reject-btn"
+           onclick="rejectUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-xmark"></i>
+
+
+       </button>
+   `;
+
+
+}
+else if(status === "DISABLED"){
+
+
+   html += `
+       <button class="action-btn edit-btn"
+           onclick="editUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-pen"></i>
+
+
+       </button>
+
+
+       <button class="action-btn approve-btn"
+           onclick="enableUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-check"></i>
+
+
+       </button>
+   `;
+
+
+}
+else if(status === "REJECTED"){
+
+
+   html += `
+       <button class="action-btn edit-btn"
+           onclick="editUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-pen"></i>
+
+
+       </button>
+
+
+       <button class="action-btn approve-btn"
+           onclick="approveUser('${user.userId}')">
+
+
+           <i class="fa-solid fa-check"></i>
+
+
+       </button>
+   `;
+
+
+}
+
+
+return html;
+
+
+}
+function viewUser(userId){
+
+
+   google.script.run
+   .withSuccessHandler(function(user){
+
+
+       Swal.fire({
+
+
+           title: "User Details",
+
+
+           html: `
+               <table style="width:100%;text-align:left">
+
+
+                   <tr>
+                       <td><b>User ID</b></td>
+                       <td>${user.userId}</td>
+                   </tr>
+
+
+                   <tr>
+                       <td><b>Name</b></td>
+                       <td>${user.name}</td>
+                   </tr>
+
+
+                   <tr>
+                       <td><b>Email</b></td>
+                       <td>${user.email}</td>
+                   </tr>
+
+
+                   <tr>
+                       <td><b>Mobile</b></td>
+                       <td>${user.mobile}</td>
+                   </tr>
+
+
+                   <tr>
+                       <td><b>Role</b></td>
+                       <td>${user.role}</td>
+                   </tr>
+
+
+                   <tr>
+                       <td><b>Status</b></td>
+                       <td>${user.status}</td>
+                   </tr>
+
+
+               </table>
+           `,
+
+
+           width:600,
+
+
+           confirmButtonColor:"#2E2278"
+
+
+       });
+
+
+   })
+
+
+   .getUserDetails(userId);
+
+
+}
+
+
+function editUser(userId){
+
+
+google.script.run
+
+
+.withSuccessHandler(function(user){
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(roles){
+
+
+       Swal.fire({
+
+
+           title:"Edit User",
+
+
+           width:700,
+
+
+html:`
+
+
+<style>
+
+
+.edit-grid{
+
+
+   display:grid;
+
+
+   grid-template-columns:1fr 1fr;
+
+
+   gap:15px;
+
+
+   margin-top:15px;
+
+
+}
+
+
+.edit-field{
+
+
+   display:flex;
+
+
+   flex-direction:column;
+
+
+}
+
+
+.edit-field label{
+
+
+   font-weight:600;
+
+
+   margin-bottom:5px;
+
+
+   text-align:left;
+
+
+}
+
+
+.edit-field input,
+.edit-field select{
+
+
+   width:100%;
+
+
+   padding:10px;
+
+
+   border:1px solid #ddd;
+
+
+   border-radius:8px;
+
+
+   font-size:14px;
+
+
+   box-sizing:border-box;
+
+
+}
+
+
+</style>
+
+
+<div class="edit-grid">
+
+
+<div class="edit-field">
+
+
+<label>User ID</label>
+
+
+<input id="editUserId"
+value="${user.userId}"
+readonly>
+
+
+</div>
+
+
+<div class="edit-field">
+
+
+<label>Name</label>
+
+
+<input id="editName"
+value="${user.name}">
+
+
+</div>
+
+
+<div class="edit-field">
+
+
+<label>Email</label>
+
+
+<input id="editEmail"
+value="${user.email}">
+
+
+</div>
+
+
+<div class="edit-field">
+
+
+<label>Mobile</label>
+
+
+<input id="editMobile"
+value="${user.mobile}">
+
+
+</div>
+<div class="edit-field">
+
+
+<label>Password</label>
+
+
+<div style="display:flex;gap:8px;align-items:center;">
+
+
+<input
+type="password"
+id="editPassword"
+value="${user.password}"
+style="flex:1;">
+
+
+<button
+type="button"
+class="action-btn view-btn"
+onclick="toggleEditPassword()">
+
+
+<i id="editPwdIcon"
+class="fa-solid fa-eye"></i>
+
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+<div class="edit-field">
+
+
+<label>Role</label>
+
+
+<select id="editRole">
+
+
+${roles.map(role => `
+<option value="${role}"
+${role === user.role ? "selected" : ""}>
+${role}
+</option>
+`).join("")}
+
+
+</select>
+
+
+</div>
+
+
+</div>
+
+
+`,
+
+
+showCancelButton:true,
+
+
+confirmButtonText:"Save Changes",
+
+
+preConfirm: () => {
+
+    const popup = Swal.getPopup();
+
+    const userId = popup.querySelector("#editUserId").value.trim();
+    const name = popup.querySelector("#editName").value.trim();
+    const email = popup.querySelector("#editEmail").value.trim();
+    const mobile = popup.querySelector("#editMobile").value.trim();
+    const password = popup.querySelector("#editPassword").value;
+    const role = popup.querySelector("#editRole").value;
+
+    console.log("EDIT USER DATA:");
+    console.log("User ID:", userId);
+    console.log("Name:", name);
+    console.log("Email:", email);
+    console.log("Mobile:", mobile);
+    console.log("Password:", password);
+    console.log("Role:", role);
+
+    if (!email) {
+        Swal.showValidationMessage("Email cannot be blank.");
+        return false;
+    }
+
+    if (!mobile) {
+        Swal.showValidationMessage("Mobile number cannot be blank.");
+        return false;
+    }
+
+    return {
+        userId: userId,
+        name: name,
+        email: email,
+        mobile: mobile,
+        password: password,
+        role: role
+    };
+}
+
+
+}).then((result)=>{
+
+
+   if(!result.isConfirmed) return;
+
+
+   google.script.run
+
+
+   .withSuccessHandler(function(success){
+
+
+       if(success){
+
+
+           Swal.fire({
+
+
+               icon:"success",
+
+
+               title:"User Updated",
+
+
+               text:"User details updated successfully."
+
+
+           });
+
+
+           loadUsers();
+
+
+       }
+
+
+   })
+
+
+   .updateUser(result.value);
+
+
+});
+
+
+       })
+
+
+       .getRoles();
+
+
+   })
+
+
+   .getUserDetails(userId);
+
+
+}
+
+
+function approveUser(userId){
+
+
+   Swal.fire({
+
+
+       title:"Approve User?",
+
+
+       text:"Do you want to activate this account?",
+
+
+       icon:"question",
+
+
+       showCancelButton:true,
+
+
+       confirmButtonText:"Approve",
+
+
+       confirmButtonColor:"#2E2278"
+
+
+   }).then((result)=>{
+
+
+       if(!result.isConfirmed) return;
+
+
+       google.script.run
+
+
+       .withSuccessHandler(function(success){
+
+
+           if(success){
+
+
+               Swal.fire({
+
+
+                   icon:"success",
+
+
+                   title:"Approved",
+
+
+                   text:"User account activated successfully."
+
+
+               });
+
+
+               loadUsers();
+
+
+           }
+
+
+       })
+
+
+       .approveUserAccount(userId);
+
+
+   });
+
+
+}
+
+
+function rejectUser(userId){
+
+
+   Swal.fire({
+
+
+       title:"Reject User?",
+
+
+       text:"Do you want to reject this account?",
+
+
+       icon:"warning",
+
+
+       showCancelButton:true,
+
+
+       confirmButtonText:"Reject",
+
+
+       confirmButtonColor:"#E74C3C"
+
+
+   }).then((result)=>{
+
+
+       if(!result.isConfirmed) return;
+
+
+       google.script.run
+
+
+       .withSuccessHandler(function(success){
+
+
+           if(success){
+
+
+               Swal.fire({
+
+
+                   icon:"success",
+
+
+                   title:"Rejected",
+
+
+                   text:"User account rejected."
+
+
+               });
+
+
+               loadUsers();
+
+
+           }
+
+
+       })
+
+
+       .rejectUserAccount(userId);
+
+
+   });
+
+
+}
+function disableUser(userId){
+
+
+   Swal.fire({
+
+
+       title: "Disable User?",
+
+
+       text: "The user will not be able to login.",
+
+
+       icon: "warning",
+
+
+       showCancelButton: true,
+
+
+       confirmButtonColor: "#555",
+
+
+       confirmButtonText: "Disable"
+
+
+   }).then((result)=>{
+
+
+       if(!result.isConfirmed) return;
+
+
+       google.script.run
+
+
+       .withSuccessHandler(function(success){
+
+
+           if(success){
+
+
+               Swal.fire({
+
+
+                   icon:"success",
+
+
+                   title:"Disabled",
+
+
+                   text:"User account disabled successfully."
+
+
+               });
+
+
+               loadUsers();
+
+
+           }
+
+
+       })
+
+
+       .disableUserAccount(userId);
+
+
+   });
+
+
+}
+
+
+function enableUser(userId){
+
+
+   Swal.fire({
+
+
+       title: "Enable User?",
+
+
+       text: "The user account will be activated.",
+
+
+       icon: "question",
+
+
+       showCancelButton: true,
+
+
+       confirmButtonColor: "#2E2278",
+
+
+       confirmButtonText: "Enable"
+
+
+   }).then((result)=>{
+
+
+       if(!result.isConfirmed) return;
+
+
+       google.script.run
+
+
+       .withSuccessHandler(function(success){
+
+
+           if(success){
+
+
+               Swal.fire({
+
+
+                   icon:"success",
+
+
+                   title:"Enabled",
+
+
+                   text:"User account enabled successfully."
+
+
+               });
+
+
+               loadUsers();
+
+
+           }
+
+
+       })
+
+
+       .enableUserAccount(userId);
+
+
+   });
+
+
+}
+function togglePassword(userId,password){
+
+
+   const span = document.getElementById("pwd_"+userId);
+
+
+   const icon = document.getElementById("icon_"+userId);
+
+
+   if(span.innerText === "********"){
+
+
+       span.innerText = password;
+
+
+       icon.classList.remove("fa-eye");
+
+
+       icon.classList.add("fa-eye-slash");
+
+
+   }else{
+
+
+       span.innerText = "********";
+
+
+       icon.classList.remove("fa-eye-slash");
+
+
+       icon.classList.add("fa-eye");
+
+
+   }
+
+
+}
+function toggleEditPassword(){
+
+
+   const pwd = document.getElementById("editPassword");
+
+
+   const icon = document.getElementById("editPwdIcon");
+
+
+   if(pwd.type === "password"){
+
+
+       pwd.type = "text";
+
+
+       icon.classList.remove("fa-eye");
+
+
+       icon.classList.add("fa-eye-slash");
+
+
+   }else{
+
+
+       pwd.type = "password";
+
+
+       icon.classList.remove("fa-eye-slash");
+
+
+       icon.classList.add("fa-eye");
+
+
+   }
+
+
+}
+// ==============================
+// USER FILTER EVENTS
+// ==============================
+
+
+document.getElementById("txtSearchUser")
+.addEventListener("keyup", applyFilters);
+
+
+document.getElementById("filterRole")
+.addEventListener("change", applyFilters);
+
+
+document.getElementById("filterStatus")
+.addEventListener("change", applyFilters);
+// Load users and role filter
+loadUsers();
+loadRoleFilter();
+
+
+</script>
+
+
+
