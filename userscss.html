@@ -1,0 +1,323 @@
+<style>
+
+
+.users-page{
+   padding:25px;
+}
+
+
+.users-header{
+   display:flex;
+   justify-content:space-between;
+   align-items:center;
+   margin-bottom:20px;
+}
+
+
+.users-header h2{
+   font-size:28px;
+   font-weight:600;
+   color:#2E2278;
+}
+
+
+.add-user-btn{
+   background:#2E2278;
+   color:#fff;
+   border:none;
+   padding:12px 20px;
+   border-radius:10px;
+   cursor:pointer;
+   font-size:15px;
+   font-weight:500;
+}
+
+
+.add-user-btn:hover{
+   background:#1f1759;
+}
+
+
+.users-toolbar{
+   display:flex;
+   gap:15px;
+   align-items:center;
+   margin-bottom:20px;
+}
+
+
+.search-box{
+   flex:1;
+   position:relative;
+}
+
+
+.search-box i{
+   position:absolute;
+   left:15px;
+   top:14px;
+   color:#888;
+}
+
+
+.search-box input{
+   width:100%;
+   padding:12px 15px 12px 42px;
+   border:1px solid #ddd;
+   border-radius:10px;
+   outline:none;
+}
+
+
+.users-toolbar select{
+   padding:12px;
+   border-radius:10px;
+   border:1px solid #ddd;
+   outline:none;
+}
+
+
+.table-container{
+   background:#fff;
+   border-radius:12px;
+   overflow:hidden;
+   box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+
+.users-table{
+   width:100%;
+   border-collapse:collapse;
+}
+
+
+.users-table thead{
+   background:#2E2278;
+   color:#fff;
+}
+
+
+.users-table th{
+   padding:15px;
+   text-align:left;
+}
+
+
+.users-table td{
+   padding:15px;
+   border-bottom:1px solid #eee;
+}
+
+
+.users-table tbody tr:hover{
+   background:#f8f8ff;
+}
+
+
+.loading{
+   text-align:center;
+   color:#888;
+   padding:40px;
+}
+/*==============================
+STATUS BADGE
+==============================*/
+
+
+.status{
+
+
+   display:inline-flex;
+
+
+   align-items:center;
+
+
+   gap:6px;
+
+
+   padding:6px 12px;
+
+
+   border-radius:20px;
+
+
+   font-size:13px;
+
+
+   font-weight:600;
+
+
+}
+
+
+.status i{
+
+
+   font-size:9px;
+
+
+}
+
+
+.status.active{
+
+
+   background:#E8F8F0;
+
+
+   color:#1E8449;
+
+
+}
+
+
+.status.pending{
+
+
+   background:#FFF7E6;
+
+
+   color:#D68910;
+
+
+}
+
+
+.status.rejected{
+
+
+   background:#FDEDEC;
+
+
+   color:#C0392B;
+
+
+}
+.action-btn{
+
+
+   width:34px;
+
+
+   height:34px;
+
+
+   border:none;
+
+
+   border-radius:8px;
+
+
+   cursor:pointer;
+
+
+   margin:0 2px;
+
+
+   color:#fff;
+
+
+   transition:.3s;
+
+
+}
+
+
+.view-btn{
+
+
+   background:#2E2278;
+
+
+}
+
+
+.edit-btn{
+
+
+   background:#3498DB;
+
+
+}
+
+
+.approve-btn{
+
+
+   background:#2ECC71;
+
+
+}
+
+
+.reject-btn{
+
+
+   background:#E74C3C;
+
+
+}
+
+
+.action-btn:hover{
+
+
+   transform:translateY(-2px);
+
+
+   opacity:.9;
+
+
+}
+.status.disabled{
+
+
+   background:#F2F2F2;
+
+
+   color:#555;
+
+
+}
+.disable-btn{
+
+
+   background:#555;
+
+
+}
+.password-box{
+
+
+   display:flex;
+
+
+   align-items:center;
+
+
+   gap:8px;
+
+
+}
+
+
+.password-box span{
+
+
+   min-width:90px;
+
+
+   font-family:monospace;
+
+
+   font-size:14px;
+
+
+}
+
+
+</style>
+
+
+
